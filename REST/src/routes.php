@@ -1,10 +1,13 @@
 <?php
 // Routes
 
-$app->get('/[{name}]', function ($request, $response, $args) {
-    // Sample log message
+$app->get('/GET/{table}[/{id}[/{columns}[/{whereColumns}[/{whereOperators}[/{whereValues}[/{order}[/{by}[/{limit}[/join]]]]]]]]]', function ($request, $response, $args) {
     $this->logger->info("Slim-Skeleton '/' route");
+    //var_dump($args);
+    $mysql = new MySQL();
+    $return = array();
+    $return["data"] = $mysql->GET($args);
 
-    // Render index view
-    return $this->renderer->render($response, 'index.phtml', $args);
+    return $this->renderer->render($response, 'json.phtml', $return);
 });
+

@@ -14,37 +14,6 @@
 class MySQL extends Root
 {
     /**
-     * @var MySQLParser for parsing MySQL commands.
-     */
-    private $parser;
-    /**
-     * Function Parser
-     * for getting objects MySQLParser
-     * @return MySQLParser if it is set.
-     */
-    private function Parser()
-    {
-        return $this->parser;
-    }
-
-    /**
-     * Function setParser
-     * for setting MySQLParser object to class.
-     * @param MySQLParser $parser to set as parser.
-     * @return bool Success of the function.
-     */
-    private function setParser($parser)
-    {
-        $success = false;
-        if($this->isObject($parser, "MySQLParser", __FUNCTION__))
-        {
-            $this->parser = $parser;
-            $success = true;
-        }
-        return $success;
-    }
-
-    /**
      * @var PDO for connecting to database.
      */
     private $conn;
@@ -87,7 +56,6 @@ class MySQL extends Root
     {
         parent::__construct();
         $this->CONNECT($address, $database, $username, $password);
-        $this->setParser(new MySQLParser($this->Conn()));
     }
 
     /**
@@ -199,8 +167,21 @@ class MySQL extends Root
         return $result;
     }
 
-    public function SELECT($columns = "*", $table = false)
+    /**
+     * Function SELECT
+     * for making SELECT query to database.
+     * @param string|array $columns Columns for the query.
+     * @param string $table Table for the query.
+     * @return bool|string|array Response from the database if successful false if not.
+     */
+    public function SELECT($columns = "*", $table)
     {
-
+        $return = false;
+        $sql = MySQLParser::Select($columns, $table);
+        if($sql)
+        {
+            $return = $this->CALL($sql);
+        }
+        return $return;
     }
 }

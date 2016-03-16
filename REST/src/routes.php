@@ -12,7 +12,9 @@ $app->get('/{app}/{action}/[/{par0}[/{par1}]]', function ($request, $response, $
         require __DIR__ . '/../src/lib/require.php';
         // Require app
         require $pathApp . "require.php";
-        return $this->renderer->render($response, 'json.phtml', $args);
+        $app = new App();
+        $result = $app->TEST();
+        return $this->renderer->render($response, 'json.phtml', $result);
     }
     else die("APP NOT SUPPORTED!");
 });

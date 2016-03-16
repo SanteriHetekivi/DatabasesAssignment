@@ -23,7 +23,7 @@ class AppRoot extends Root
      * for getting object's MySQL class.
      * @return MySQL class for connecting to database.
      */
-    private function MySQL()
+    protected function MySQL()
     {
         return $this->mysql;
     }
@@ -46,22 +46,30 @@ class AppRoot extends Root
     }
 
     /**
-     * @var AUTHMySQL Authorisation data.
+     * Function Connect
+     * for connecting app to MySQL database.
+     * @return bool Was connection successful.
      */
-    private $authMysql;
-
-    /**
-     * Function AuthMySQL
-     * for
-     * @return AUTHMySQL MySQL Authorisation data.
-     */
-    private function AuthMySQL()
+    protected function Connect()
     {
-        return $this->authMysql;
+        $success = false;
+        if(class_exists("AUTHMySQL"))
+        {
+            $success = $this->setMySQL(
+                new MySQL(AUTHMySQL::$MYSQL_ADDRESS, AUTHMySQL::$MYSQL_DATABASE,
+                    AUTHMySQL::$MYSQL_USERNAME, AUTHMySQL::$MYSQL_PASSWORD)
+            );
+        }
+        else
+        {
+            $this->addError(__FUNCTION__, "No class named AUTHMySQL!", "");
+        }
+        return $success;
     }
 
     protected function __construct()
     {
         parent::__construct();
+        $this->Connect();
     }
 }

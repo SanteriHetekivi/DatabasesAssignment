@@ -13,13 +13,26 @@
  */
 class MySQLParser extends Root
 {
-    public function Select($columns = "*", $table = false)
+    /**
+     * Function Select
+     * for parsing MySQL select query.
+     * @param string|array $columns Columns for the query.
+     * @param string $table Table for the query.
+     * @return bool|string Query if successful false if not.
+     */
+    public static function Select($columns = "*", $table)
     {
         $return = false;
 
-        $sql = "SELECT";
-
-
+        $sql = "SELECT ";
+        $cols = MySQLParser::Columns($columns);
+        if($cols) $sql .= $cols;
+        $tab = MySQLParser::Table($table);
+        if($tab) $sql .= " FROM " . $tab;
+        
+        if($cols && $tab) $return = $sql;
+        
+        return $return;
     }
 
     /**
@@ -29,7 +42,7 @@ class MySQLParser extends Root
      * @param array|string $columns Column names as a array or string.
      * @return bool|string SQL string if successful and false if not.
      */
-    private function Columns($columns)
+    private static function Columns($columns)
     {
         $result = false;
         if(Checker::isString($columns))
@@ -45,11 +58,11 @@ class MySQLParser extends Root
             $cols = array();
             foreach($columns as $column)
             {
-                $col = MySQLChecker::isColumn($column);
+                $col = MySQLParser::Column($column);
                 if($col) $cols[] = $col;
                 else
                 {
-                    $this->addError(__FUNCTION__, "Given column is not suitable!", $column);
+                    MySQLParser::addError(__FUNCTION__, "Given column is not suitable!", $column);
                     break;
                 }
             }
@@ -58,8 +71,43 @@ class MySQLParser extends Root
                 $result = implode(" ,", $cols);
             }
         }
-        else $this->addError(__FUNCTION__, "Given columns are not array or is empty!", $columns);
+        else MySQLParser::addError(__FUNCTION__, "Given columns are not array or is empty!", $columns);
         return $result;
+    }
+
+    /**
+     * Function Table
+     * for checking and formatting table name.
+     * @param string $table table name.
+     * @return bool|string Formatted table name or false if check did not pass.
+     */
+    private static function Table($table)
+    {
+        $return = false;
+        if(MySQLChecker::isTable($table))
+        {
+            $return = "`" . $table . "`";
+        }
+        else
+        {
+            MySQLParser::addError(__FUNCTION__, "Given table is not suitable!", $table);
+        }
+        return $return;
+    }
+
+    private static function Column($column)
+    {
+        $return = false;
+        if(MySQLChecker::isColumn($column))
+        {
+            if($column === "*") $return = $column;
+            else $return = "`" . $column . "`";
+        }
+        else
+        {
+            MySQLParser::addError(__FUNCTION__, "Given column is not suitable!", $column);
+        }
+        return $return;
     }
     // TODO: Parsing functions.
 }

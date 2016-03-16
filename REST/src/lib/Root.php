@@ -15,38 +15,6 @@
  */
 class Root
 {
-    /**
-     * @var ErrorCollection Object's collection of errors.
-     */
-    private $errorCollection;
-
-    /**
-     * Function ErrorCollection
-     * for getting errorCollection.
-     * @return ErrorCollection Object's collection of errors.
-     */
-    protected function ErrorCollection()
-    {
-        return $this->errorCollection;
-    }
-
-    /**
-     * Function setErrorCollection
-     * for setting object's errorCollection.
-     * @param $errorCollection ErrorCollection to set as object's errorCollection.
-     */
-    private function setErrorCollection($errorCollection)
-    {
-        if(Checker::isObject($errorCollection, "ErrorCollection"))
-        {
-            $this->errorCollection = $errorCollection;
-        }
-        else
-        {
-            //NO ERROR COLLECTION TO REPORT THIS ERROR!!
-            die("INCORRECT ERROR COLLECTION!!!");
-        }
-    }
 
     /**
      * Function addError
@@ -58,11 +26,7 @@ class Root
      */
     public function addError($func = "", $message = "", $variable = "")
     {
-        $success = false;
-        if(Checker::isObject($this->ErrorCollection(), "ErrorCollection"))
-        {
-            $success = $this->ErrorCollection()->addError(false, __FILE__, $func, $message, $variable);
-        }
+        $success = ErrorCollection::addError(false, __FILE__, $func, $message, $variable);
         return $success;
     }
 
@@ -71,7 +35,6 @@ class Root
      */
     protected function __construct()
     {
-        $this->setErrorCollection(new ErrorCollection());
     }
 
     /**

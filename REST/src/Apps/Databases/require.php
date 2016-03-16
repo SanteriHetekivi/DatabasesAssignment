@@ -14,6 +14,8 @@
  * Filenames to require in this directory.
  */
 $files = array(
+    "Setup",
+    "PRIVATE",
     "App",
 );
 

@@ -16,16 +16,16 @@ class ErrorCollection
     /**
      * @var array of Err classes.
      */
-    private $errors;
+    private static $errors;
 
     /**
      * Function Errors
      * for getting all errors.
      * @return array Err array.
      */
-    public function Errors()
+    public static function Errors()
     {
-        return $this->errors;
+        return ErrorCollection::$errors;
     }
 
     /**
@@ -34,27 +34,27 @@ class ErrorCollection
      * @param array $errors Err array to set as errors.
      * @return bool Success of the function.
      */
-    public function setErrors($errors)
+    public static function setErrors($errors)
     {
         $success = false;
-        $old_errors = $this->Errors();
+        $old_errors = ErrorCollection::Errors();
         if(Checker::isArray($errors))
         {
-            $this->errors = array();
+            ErrorCollection::$errors = array();
             foreach($errors as $error)
             {
-                $success = $this->addError($error);
+                $success = ErrorCollection::addError($error);
                 if($success === false) break;
             }
         }
         else
         {
-            $this->addError(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
+            ErrorCollection::addError(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
         }
 
         if($success === false)
         {
-            $this->errors = $old_errors;
+            ErrorCollection::$errors = $old_errors;
         }
         return $success;
     }
@@ -69,22 +69,22 @@ class ErrorCollection
      * @param object|string $variable Any object or variable. (Optional)
      * @return bool Success of the function.
      */
-    public function addError($error = false, $file = "", $func = "", $message = "", $variable = "")
+    public static function addError($error = false, $file = "", $func = "", $message = "", $variable = "")
     {
         $success = true;
         if(Checker::isObject($error, "Err"))
         {
-            $this->errors[] = $error;
+            ErrorCollection::$errors[] = $error;
             $success = true;
         }
         else if(Checker::isString($file) && Checker::isString($func) && Checker::isString($message) && Checker::isVariable($variable))
         {
-            $this->errors[] = new Err($file, $func, $message);
+            ErrorCollection::$errors[] = new Err($file, $func, $message);
             $success = true;
         }
         else
         {
-            $this->addError(new Err(__FILE__, __FUNCTION__, "Can only add Err class to ErrorCollection"));
+            ErrorCollection::addError(new Err(__FILE__, __FUNCTION__, "Can only add Err class to ErrorCollection"));
         }
         return $success;
     }
@@ -95,27 +95,27 @@ class ErrorCollection
      * @param array $errors Array of Err classes.
      * @return bool Success of the function.
      */
-    public function addErrors($errors)
+    public static function addErrors($errors)
     {
         $success = false;
-        $old_errors = $this->Errors();
+        $old_errors = ErrorCollection::Errors();
         if(Checker::isArray($errors))
         {
             $success = true;
             foreach($errors as $error)
             {
-                $success = $this->addError($error);
+                $success = ErrorCollection::addError($error);
                 if($success === false) break;
             }
         }
         else
         {
-            $this->addError(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
+            ErrorCollection::addError(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
         }
 
         if($success === false)
         {
-            $this->setErrors($old_errors);
+            ErrorCollection::setErrors($old_errors);
         }
         return $success;
     }

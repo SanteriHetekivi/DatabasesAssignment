@@ -12,7 +12,13 @@
  * for setting basic root of
  * MySQLObject.
  */
-class MySQLObject
+class MySQLObject extends Root
 {
-
+    /**
+     * MySQLObject constructor.
+     */
+    protected function __construct()
+    {
+        parent::__construct();
+    }
 }

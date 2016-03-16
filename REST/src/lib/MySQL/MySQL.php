@@ -36,14 +36,10 @@ class MySQL extends Root
     private function setParser($parser)
     {
         $success = false;
-        if(Checker::isObject($parser, "MySQLParser"))
+        if($this->isObject($parser, "MySQLParser", __FUNCTION__))
         {
             $this->parser = $parser;
             $success = true;
-        }
-        else
-        {
-            $this->addError(__FUNCTION__, "Passed parser is not MySQLParser object!", $parser);
         }
         return $success;
     }
@@ -72,14 +68,10 @@ class MySQL extends Root
     private function setConn($conn)
     {
         $success = false;
-        if(Checker::isObject($conn, "PDO"))
+        if($this->isObject($conn, "PDO", __FUNCTION__))
         {
             $this->conn = $conn;
             $success = true;
-        }
-        else
-        {
-            $this->addError(__FUNCTION__, "Passed conn is not PDO object!", $conn);
         }
         return $success;
     }

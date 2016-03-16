@@ -7,18 +7,18 @@
  */
 
 /**
- * Require file for directory /libs
+ * Require file for directory /libs/MySQL
  */
 
 /**
  * Filenames to require in this directory.
  */
 $files = array(
-    "Checker",
-    "Err",
-    "ErrorCollection",
-    "Root",
-    "AppRoot"
+    "MySQLChecker",
+    "MySQLParser",
+    "MysqlColumn",
+    "MySQL",
+    "MySQLObject"
 );
 
 /**

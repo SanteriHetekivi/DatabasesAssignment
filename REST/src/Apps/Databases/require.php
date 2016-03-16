@@ -2,23 +2,19 @@
 /**
  * Created by IntelliJ IDEA.
  * User: Santeri Hetekivi
- * Date: 12.3.2016
- * Time: 12.24
+ * Date: 16.3.2016
+ * Time: 17.44
  */
 
 /**
- * Require file for directory /libs/MySQL
+ * Require file for directory /src/Apps/Databases
  */
 
 /**
  * Filenames to require in this directory.
  */
 $files = array(
-    "MySQLChecker",
-    "MySQLParser",
-    "MysqlColumn",
-    "MySQL",
-    "MySQLObject"
+    "App",
 );
 
 /**

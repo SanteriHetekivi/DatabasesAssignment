@@ -164,6 +164,19 @@ class MySQL extends Root
     }
 
     /**
+     * Function checkConnection
+     * for checking connection to database.
+     * @param bool|string $addErrorFunction Function name if error is wanted.
+     * @return bool Was there connection.
+     */
+    private function checkConnection($addErrorFunction = false)
+    {
+        $success = Checker::isObject($this->Conn(), "PDO");
+        if($addErrorFunction) $this->addError($addErrorFunction, "Connection is not set!", $this->Conn());
+        return $success;
+    }
+
+    /**
      * Function CALL
      * for sending MySQL queries to database.
      * @param string $sql MySQL query.
@@ -194,16 +207,8 @@ class MySQL extends Root
         return $result;
     }
 
-    /**
-     * Function checkConnection
-     * for checking connection to database.
-     * @param bool|string $addErrorFunction Function name if error is wanted.
-     * @return bool Was there connection.
-     */
-    private function checkConnection($addErrorFunction = false)
+    public function SELECT($columns = "*", $table = false)
     {
-        $success = Checker::isObject($this->Conn(), "PDO");
-        if($addErrorFunction) $this->addError($addErrorFunction, "Connection is not set!", $this->Conn());
-        return $success;
+
     }
 }

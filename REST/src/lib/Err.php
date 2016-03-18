@@ -148,7 +148,8 @@ class Err
         return array(
             "file" => $this->File(),
             "func" => $this->Func(),
-            "message" => $this->Message()
+            "message" => $this->Message(),
+            "variable" => $this->Variable()
         );
     }
 }

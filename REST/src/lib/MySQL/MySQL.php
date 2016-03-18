@@ -55,6 +55,7 @@ class MySQL extends Root
     public function __construct($address, $database, $username, $password)
     {
         parent::__construct();
+        $this->FILE = __FILE__;
         $this->CONNECT($address, $database, $username, $password);
     }
 
@@ -132,7 +133,8 @@ class MySQL extends Root
     private function checkConnection($addErrorFunction = false)
     {
         $success = Checker::isObject($this->Conn(), "PDO");
-        if($addErrorFunction) $this->addError($addErrorFunction, "Connection is not set!", $this->Conn());
+        if($addErrorFunction && $success === false) $this->addError($addErrorFunction,
+            "Connection is not set!", $this->Conn());
         return $success;
     }
 
@@ -174,7 +176,7 @@ class MySQL extends Root
      * @param string $table Table for the query.
      * @return bool|string|array Response from the database if successful false if not.
      */
-    public function SELECT($columns = "*", $table)
+    public function SELECT($columns = "*", $table )
     {
         $return = false;
         $sql = MySQLParser::Select($columns, $table);
@@ -183,5 +185,16 @@ class MySQL extends Root
             $return = $this->CALL($sql);
         }
         return $return;
+    }
+
+    public function INSERT($columns, $table)
+    {
+        //TODO: Complete
+    }
+
+    public function hasId($id, $table)
+    {
+        $column = $table."Id";
+        //TODO: Complete
     }
 }

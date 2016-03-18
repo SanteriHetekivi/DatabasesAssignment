@@ -15,6 +15,7 @@
  */
 class Root
 {
+    protected $FILE;
 
     /**
      * Function addError
@@ -24,9 +25,9 @@ class Root
      * @param object|string $variable Any object or variable.
      * @return bool Success of the function.
      */
-    public function addError($func = "", $message = "", $variable = "")
+    protected function addError($func = "", $message = "", $variable = "")
     {
-        $success = ErrorCollection::addError(false, __FILE__, $func, $message, $variable);
+        $success = ErrorCollection::addError($this->FILE, $func, $message, $variable);
         return $success;
     }
 
@@ -35,6 +36,7 @@ class Root
      */
     protected function __construct()
     {
+        $this->FILE = __FILE__;
     }
 
     /**
@@ -56,7 +58,7 @@ class Root
      */
     protected function isObject($obj, $option, $addErrorFunction = false)
     {
-        $success = Checker::isObject($obj,$option);
+        $success = Checker::isObject($obj,$option, false);
         if($success == false && Checker::isString($addErrorFunction) && Checker::isString($option))
         {
             $this->addError($addErrorFunction, "Given object was not $option!", $obj);

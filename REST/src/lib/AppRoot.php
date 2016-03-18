@@ -67,9 +67,15 @@ class AppRoot extends Root
         return $success;
     }
 
+    /**
+     * AppRoot constructor.
+     */
     protected function __construct()
     {
         parent::__construct();
+        $this->FILE = __FILE__;
         $this->Connect();
     }
+
+
 }

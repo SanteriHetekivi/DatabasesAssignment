@@ -57,6 +57,25 @@ class MySQLColumn extends Root
         }
         return $success;
     }
+
+    /**
+     * MySQLColumn constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->FILE = __FILE__;
+    }
+
+    /**
+     * MySQLColumn destructor.
+     */
+    public function __destruct()
+    {
+        parent::__destruct();
+        unset($this->type);
+
+    }
     // TODO Add size.
     // TODO Add empty.
     // TODO Add checkers.

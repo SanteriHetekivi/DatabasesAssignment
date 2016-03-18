@@ -20,5 +20,14 @@ class MySQLObject extends Root
     protected function __construct()
     {
         parent::__construct();
+        $this->FILE = __FILE__;
+    }
+
+    /**
+     * MySQLObject destructor.
+     */
+    public function __destruct()
+    {
+        parent::__destruct();
     }
 }

@@ -11,7 +11,7 @@
  * Class MySQLParser
  * for parsing SQL queries.
  */
-class MySQLParser extends Root
+class MySQLParser
 {
     /**
      * Function Select
@@ -47,7 +47,7 @@ class MySQLParser extends Root
         $result = false;
         if(Checker::isString($columns))
         {
-            if(Checker::Contains($columns, SetupRoot::$DECIMETER))
+            if(Checker::Contains($columns, SetupRoot::$DECIMETER, false))
             {
                 $columns = explode(SetupRoot::$DECIMETER, $columns);
             }
@@ -108,6 +108,34 @@ class MySQLParser extends Root
             MySQLParser::addError(__FUNCTION__, "Given column is not suitable!", $column);
         }
         return $return;
+    }
+
+    /**
+     * Function idName
+     * @param string $table Name of the table.
+     * @return string Id of the table.
+     */
+    private static function idName($table)
+    {
+        $return = false;
+        if(MySQLChecker::isTable($table))
+        {
+            $return = $table."Id";
+        }
+        return $return;
+    }
+    /**
+     * Function addError
+     * for adding error to ErrorCollection.
+     * @param string $func String of the error function.
+     * @param string $message String of the error message.
+     * @param object|string $variable Any object or variable.
+     * @return bool Success of the function.
+     */
+    private static function addError($func = "", $message = "", $variable = "")
+    {
+        $success = ErrorCollection::addError(__FILE__, $func, $message, $variable);
+        return $success;
     }
     // TODO: Parsing functions.
 }

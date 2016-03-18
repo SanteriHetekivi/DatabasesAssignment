@@ -17,6 +17,9 @@ $files = array(
     "Checker",
     "Err",
     "ErrorCollection",
+    "Message",
+    "MessageCollection",
+    "DATA",
     "Root",
     "AppRoot"
 );
@@ -49,3 +52,4 @@ if(empty($directories) === false)
         require __DIR__ . "/" . $directory . "/require.php";
     }
 }
+

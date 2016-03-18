@@ -22,7 +22,9 @@ class SetupRoot
      * @var string Decimeter for string that contain array.
      */
     public static $DECIMETER = ",";
-
+    public static $MESSAGE_TYPES = array(
+        "message", "error"
+    );
 
 
     /**

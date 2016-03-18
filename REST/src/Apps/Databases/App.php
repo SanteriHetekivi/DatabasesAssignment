@@ -19,11 +19,19 @@ class App extends AppRoot
     public function __construct()
     {
         parent::__construct();
+        $this->FILE = __FILE__;
     }
 
+    /**
+     * Function TEST
+     * for testing.
+     * @return array|bool|string test result.
+     */
     public function TEST()
     {
-        return $this->MySQL()->SELECT("*", "testi");
+        $return = $this->MySQL()->SELECT("*", "testi");
+        DATA::setSuccess(Checker::isArray($return));
+        return $return;
     }
 
 }

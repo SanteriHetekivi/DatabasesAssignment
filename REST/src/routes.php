@@ -13,8 +13,8 @@ $app->get('/{app}/{action}/[/{par0}[/{par1}]]', function ($request, $response, $
         // Require app
         require $pathApp . "require.php";
         $app = new App();
-        $result = $app->TEST();
-        return $this->renderer->render($response, 'json.phtml', $result);
+        $data = $app->TEST();
+        return $this->renderer->render($response, 'json.phtml', array("data" => DATA::MAKE($data)));
     }
     else die("APP NOT SUPPORTED!");
 });

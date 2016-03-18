@@ -43,13 +43,13 @@ class ErrorCollection
             ErrorCollection::$errors = array();
             foreach($errors as $error)
             {
-                $success = ErrorCollection::addError($error);
+                $success = ErrorCollection::addErr($error);
                 if($success === false) break;
             }
         }
         else
         {
-            ErrorCollection::addError(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
+            ErrorCollection::addErr(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
         }
 
         if($success === false)
@@ -60,31 +60,74 @@ class ErrorCollection
     }
 
     /**
+     * Function hasErrors
+     * for checking if ErrorCollection has errors.
+     * @return bool Does ErrorCollection have errors.
+     */
+    public static function hasErrors()
+    {
+        return Checker::isArray(ErrorCollection::Errors(), false);
+    }
+
+    /**
+     * Function ErrorsData
+     * for getting data array with data from
+     * every error.
+     * @return array Errors data.
+     */
+    public static function ErrorsData()
+    {
+        $return = array();
+        if(ErrorCollection::hasErrors())
+        {
+            foreach(ErrorCollection::Errors() as $error)
+            {
+                $return[] = $error->GET();
+            }
+        }
+        return $return;
+
+    }
+    /**
      * Function addError
-     * for adding error.
-     * @param Err|bool $error that will be added to errors.
-     * @param string $file String of the errors file. (Optional)
-     * @param string $func String of the error function. (Optional)
-     * @param string $message String of the error message. (Optional)
-     * @param object|string $variable Any object or variable. (Optional)
+     * for adding error from values.
+     * @param string $file String of the errors file.
+     * @param string $func String of the error function.
+     * @param string $message String of the error message.
+     * @param object|string $variable Any object or variable.(Optional)
      * @return bool Success of the function.
      */
-    public static function addError($error = false, $file = "", $func = "", $message = "", $variable = "")
+    public static function addError($file, $func, $message, $variable = "")
+    {
+        $success = false;
+        if(Checker::isString($file) && Checker::isString($func) && Checker::isString($message))
+        {
+            ErrorCollection::$errors[] = new Err($file, $func, $message, $variable);
+            $success = true;
+        }
+        else
+        {
+            ErrorCollection::addErr(new Err(__FILE__, __FUNCTION__,
+                "All info values for error needs to be strings and variable any variable",
+                array($file, $func, $message, $variable)
+            ));
+        }
+        return $success;
+    }
+
+    /**
+     * Function addErr
+     * for adding error from Err object.
+     * @param Err $error Err object to add.
+     * @return bool Success of the function.
+     */
+    public static function addErr($error)
     {
         $success = true;
         if(Checker::isObject($error, "Err"))
         {
             ErrorCollection::$errors[] = $error;
             $success = true;
-        }
-        else if(Checker::isString($file) && Checker::isString($func) && Checker::isString($message) && Checker::isVariable($variable))
-        {
-            ErrorCollection::$errors[] = new Err($file, $func, $message);
-            $success = true;
-        }
-        else
-        {
-            ErrorCollection::addError(new Err(__FILE__, __FUNCTION__, "Can only add Err class to ErrorCollection"));
         }
         return $success;
     }
@@ -104,13 +147,13 @@ class ErrorCollection
             $success = true;
             foreach($errors as $error)
             {
-                $success = ErrorCollection::addError($error);
+                $success = ErrorCollection::addErr($error);
                 if($success === false) break;
             }
         }
         else
         {
-            ErrorCollection::addError(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
+            ErrorCollection::addErr(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
         }
 
         if($success === false)

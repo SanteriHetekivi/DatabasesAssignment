@@ -14,6 +14,13 @@
 class MessageCollection
 {
     /**
+     * Function ERROR_INFO
+     * for making ERROR_INFO data.
+     * @param string $FUNCTION Name of the function.
+     * @return array ERROR_INFO data.
+     */
+    private static function ERROR_INFO($FUNCTION){ return array(Err::FILE => __FILE__, Err::FUNC => $FUNCTION); }
+    /**
      * @var array of Message classes.
      */
     private static $messages = array();
@@ -38,7 +45,7 @@ class MessageCollection
     {
         $success = false;
         $old_messages = MessageCollection::Messages();
-        if(Checker::isArray($messages))
+        if(Checker::isArray($messages, true, self::ERROR_INFO(__FUNCTION__)))
         {
             MessageCollection::$messages = array();
             foreach($messages as $message)
@@ -46,10 +53,6 @@ class MessageCollection
                 $success = MessageCollection::addMessageObject($message);
                 if($success === false) break;
             }
-        }
-        else
-        {
-            MessageCollection::addError(__FUNCTION__, "Given message where not array", $messages);
         }
 
         if($success === false)
@@ -97,8 +100,9 @@ class MessageCollection
      */
     public static function addMessage($type, $html)
     {
+        $errorInfo = self::ERROR_INFO(__FUNCTION__);
         $success = false;
-        if(Checker::isString($type) && Checker::isString($html))
+        if(Checker::isString($type, true, $errorInfo) && Checker::isString($html, true, $errorInfo))
         {
             MessageCollection::$messages[] = new Message($type, $html);
             $success = true;
@@ -122,7 +126,7 @@ class MessageCollection
     public static function addMessageObject($message)
     {
         $success = true;
-        if(Checker::isObject($message, "Message"))
+        if(Checker::isObject($message, "Message", self::ERROR_INFO(__FUNCTION__)))
         {
             MessageCollection::$messages[] = $message;
             $success = true;
@@ -140,7 +144,7 @@ class MessageCollection
     {
         $success = false;
         $old_messages = MessageCollection::Messages();
-        if(Checker::isArray($messages))
+        if(Checker::isArray($messages, false, self::ERROR_INFO(__FUNCTION__)))
         {
             $success = true;
             foreach($messages as $message)
@@ -149,10 +153,6 @@ class MessageCollection
                 if($success === false) break;
             }
         }
-        else
-        {
-            MessageCollection::addError(__FILE__, __FUNCTION__, "Given message where not array");
-        }
 
         if($success === false)
         {
@@ -160,6 +160,7 @@ class MessageCollection
         }
         return $success;
     }
+
     /**
      * Function addError
      * for adding error to ErrorCollection.

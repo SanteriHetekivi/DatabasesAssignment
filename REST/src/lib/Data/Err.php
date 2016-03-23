@@ -11,8 +11,11 @@
  * Class Err
  * for storing and managing error data.
  */
-class Err
+class Err extends Root
 {
+
+    const FILE = "file";
+    const FUNC = "function";
     /**
      * @var string Filename for the error.
      */

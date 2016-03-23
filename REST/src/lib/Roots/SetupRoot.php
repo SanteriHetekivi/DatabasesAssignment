@@ -21,11 +21,21 @@ class SetupRoot
     /**
      * @var string Decimeter for string that contain array.
      */
-    public static $DECIMETER = ",";
-    public static $MESSAGE_TYPES = array(
+    const DECIMETER = ",";
+    const ESCAPE_NAME = "`";
+    const MESSAGE_TYPES = array(
         "message", "error"
     );
+    const WHERE_COLUMN = "column";
+    const WHERE_OPERATOR = "operator";
+    const WHERE_VALUE = "value";
+    const WHERE_CONJUNCTION = "conjunction";
+    const OPERATORS = "=><";
+    const CONJUNCTIONS = array("AND", "OR");
+    const DEFAULT_OPERATOR = "=";
+    const DEFAULT_CONJUNCTION = "AND";
 
+    const CLASS_WHERE = "Where";
 
     /**
      * FUNCTIONS AND VARIABLES FOR SETTING APP
@@ -35,7 +45,8 @@ class SetupRoot
      * @var array of supported apps.
      */
     private static $apps = array(
-       "Databases"
+       "Databases",
+        "Yritys"
     );
     /**
      * @var string Name of the app.
@@ -68,7 +79,7 @@ class SetupRoot
         $app = SetupRoot::App();
         if($app)
         {
-            $return = __DIR__ . "/Apps/" . $app . "/";
+            $return = __DIR__ . "/../.." . "/Apps/" . $app . "/";
         }
         return $return;
     }

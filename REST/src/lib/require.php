@@ -14,14 +14,6 @@
  * Filenames to require in this directory.
  */
 $files = array(
-    "Checker",
-    "Err",
-    "ErrorCollection",
-    "Message",
-    "MessageCollection",
-    "DATA",
-    "Root",
-    "AppRoot"
 );
 
 /**
@@ -39,6 +31,10 @@ if(empty($files) === false)
  * Directories to require in this directory.
  */
 $directories = array(
+    "External",
+    "Roots",
+    "Data",
+    "Collections",
     "MySQL",
 );
 

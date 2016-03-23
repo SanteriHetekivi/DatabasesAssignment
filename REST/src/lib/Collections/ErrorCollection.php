@@ -14,6 +14,13 @@
 class ErrorCollection
 {
     /**
+     * Function ERROR_INFO
+     * for making ERROR_INFO data.
+     * @param string $FUNCTION Name of the function.
+     * @return array ERROR_INFO data.
+     */
+    private static function ERROR_INFO($FUNCTION){ return array(Err::FILE => __FILE__, Err::FUNC => $FUNCTION); }
+    /**
      * @var array of Err classes.
      */
     private static $errors;
@@ -38,7 +45,7 @@ class ErrorCollection
     {
         $success = false;
         $old_errors = ErrorCollection::Errors();
-        if(Checker::isArray($errors))
+        if(Checker::isArray($errors, true, self::ERROR_INFO(__FUNCTION__)))
         {
             ErrorCollection::$errors = array();
             foreach($errors as $error)
@@ -46,10 +53,6 @@ class ErrorCollection
                 $success = ErrorCollection::addErr($error);
                 if($success === false) break;
             }
-        }
-        else
-        {
-            ErrorCollection::addErr(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
         }
 
         if($success === false)
@@ -100,17 +103,12 @@ class ErrorCollection
     public static function addError($file, $func, $message, $variable = "")
     {
         $success = false;
-        if(Checker::isString($file) && Checker::isString($func) && Checker::isString($message))
+        $errorInfo = self::ERROR_INFO(__FUNCTION__);
+        if(Checker::isString($file, true, $errorInfo) && Checker::isString($func, true, $errorInfo) &&
+            Checker::isString($message, true, $errorInfo))
         {
             ErrorCollection::$errors[] = new Err($file, $func, $message, $variable);
             $success = true;
-        }
-        else
-        {
-            ErrorCollection::addErr(new Err(__FILE__, __FUNCTION__,
-                "All info values for error needs to be strings and variable any variable",
-                array($file, $func, $message, $variable)
-            ));
         }
         return $success;
     }
@@ -124,7 +122,7 @@ class ErrorCollection
     public static function addErr($error)
     {
         $success = true;
-        if(Checker::isObject($error, "Err"))
+        if(Checker::isObject($error, "Err", self::ERROR_INFO(__FUNCTION__)))
         {
             ErrorCollection::$errors[] = $error;
             $success = true;
@@ -132,6 +130,26 @@ class ErrorCollection
         return $success;
     }
 
+    /**
+     * Function addErrorInfo
+     * for adding error with info data.
+     * @param array $ERROR_INFO Info containing filename and function.
+     * @param string $message Message for error.
+     * @param string $variable Variable for error.
+     * @return bool Was operation successful.
+     */
+    public static function addErrorInfo($ERROR_INFO, $message = "", $variable = "")
+    {
+        if(Checker::isArray($ERROR_INFO) && isset($ERROR_INFO[Err::FILE]) && isset($ERROR_INFO[Err::FUNC]))
+        {
+            return ErrorCollection::addError($ERROR_INFO[Err::FILE], $ERROR_INFO[Err::FUNC], $message, $variable);
+        }
+        else
+        {
+            self::addError(__FILE__, __FUNCTION__, "Incorrect ERROR INFO!", $ERROR_INFO);
+            return false;
+        }
+    }
     /**
      * Function addErrors
      * for adding array of errors.
@@ -142,7 +160,7 @@ class ErrorCollection
     {
         $success = false;
         $old_errors = ErrorCollection::Errors();
-        if(Checker::isArray($errors))
+        if(Checker::isArray($errors, true, self::ERROR_INFO(__FUNCTION__)))
         {
             $success = true;
             foreach($errors as $error)
@@ -150,10 +168,6 @@ class ErrorCollection
                 $success = ErrorCollection::addErr($error);
                 if($success === false) break;
             }
-        }
-        else
-        {
-            ErrorCollection::addErr(new Err(__FILE__, __FUNCTION__, "Given error where not array"));
         }
 
         if($success === false)

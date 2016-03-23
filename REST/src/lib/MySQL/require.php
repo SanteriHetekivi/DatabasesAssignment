@@ -15,8 +15,11 @@
  */
 $files = array(
     "MySQLChecker",
+    "Where",
     "MySQLParser",
-    "MysqlColumn",
+    "OrderBy",
+    "MySQLQuery",
+    "MySQLColumn",
     "MySQL",
     "MySQLObject"
 );

@@ -11,7 +11,7 @@
  * Class Message
  * for storing message to user.
  */
-class Message
+class Message extends Root
 {
     /**
      * @var string Type of the message
@@ -37,7 +37,7 @@ class Message
     public function setType($type)
     {
         $success = false;
-        if(Checker::isString($type) && in_array($type, Setup::$MESSAGE_TYPES))
+        if(Checker::isString($type) && in_array($type, Setup::MESSAGE_TYPES))
         {
             $this->type = $type;
             $success = true;
@@ -70,7 +70,7 @@ class Message
     public function setHTML($html)
     {
         $success = false;
-        if(Checker::isString($html))
+        if(Checker::isString($html, $this->ERROR_INFO(__FUNCTION__)))
         {
             $this->html = $html;
             $success = true;
@@ -85,6 +85,7 @@ class Message
      */
     public function __construct($type, $html)
     {
+        parent::__construct();
         $this->setType($type);
         $this->setHTML($html);
     }
@@ -94,6 +95,7 @@ class Message
      */
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->html);
         unset($this->type);
     }
@@ -107,18 +109,5 @@ class Message
     {
         return array("type" => $this->Type(), "html" => $this->HTML());
     }
-
-    /**
-     * Function addError
-     * for adding error to ErrorCollection.
-     * @param string $func String of the error function.
-     * @param string $message String of the error message.
-     * @param object|string $variable Any object or variable.
-     * @return bool Success of the function.
-     */
-    private function addError($func = "", $message = "", $variable = "")
-    {
-        return ErrorCollection::addError(__FILE__, $func, $message, $variable);
-    }
-
 }
+

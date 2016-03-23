@@ -15,8 +15,17 @@
  */
 class Root
 {
+    /**
+     * @var string Filename.
+     */
     protected $FILE;
-
+    /**
+     * Function ERROR_INFO
+     * for making ERROR_INFO data.
+     * @param string $FUNCTION Name of the function.
+     * @return array ERROR_INFO data.
+     */
+    protected function ERROR_INFO($FUNCTION){ return array(Err::FILE => $this->FILE, Err::FUNC => $FUNCTION); }
     /**
      * Function addError
      * for adding error to ErrorCollection.
@@ -58,7 +67,7 @@ class Root
      */
     protected function isObject($obj, $option, $addErrorFunction = false)
     {
-        $success = Checker::isObject($obj,$option, false);
+        $success = Checker::isObject($obj,$option);
         if($success == false && Checker::isString($addErrorFunction) && Checker::isString($option))
         {
             $this->addError($addErrorFunction, "Given object was not $option!", $obj);

@@ -7,16 +7,14 @@
  */
 
 /**
- * Require file for directory /src/Apps/Databases
+ * Require file for directory /src/Apps/Databases/Objects
  */
 
 /**
  * Filenames to require in this directory.
  */
 $files = array(
-    "Setup",
-    "PRIVATE",
-    "App",
+    "User",
 );
 
 /**
@@ -34,7 +32,6 @@ if(empty($files) === false)
  * Directories to require in this directory.
  */
 $directories = array(
-    "Objects"
 );
 
 /**

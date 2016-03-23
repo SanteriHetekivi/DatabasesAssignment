@@ -3,15 +3,15 @@
 /**
  * Created by IntelliJ IDEA.
  * User: Santeri Hetekivi
- * Date: 15.3.2016
- * Time: 16.39
+ * Date: 22.3.2016
+ * Time: 12.38
  */
 
 /**
- * Class AppRoot
- * as root for App classes.
+ * Class MySQLRoot
+ * for all classes needing MySQL connection.
  */
-class AppRoot extends Root
+class MySQLRoot extends Root
 {
     /**
      * @var MySQL class for connecting to database.
@@ -37,7 +37,7 @@ class AppRoot extends Root
     private function setMySQL($mysql)
     {
         $success = false;
-        if($this->isObject($mysql, "MySQL"))
+        if($this->isObject($mysql, "MySQL", __FUNCTION__))
         {
             $this->mysql = $mysql;
             $success = true;
@@ -67,8 +67,13 @@ class AppRoot extends Root
         return $success;
     }
 
+    public function Connected($errorFunction = false)
+    {
+        return $this->isObject($this->MySQL(), "MySQL", $errorFunction) && $this->MySQL()->checkConnection($errorFunction);
+    }
+
     /**
-     * AppRoot constructor.
+     * MySQLRoot constructor.
      */
     protected function __construct()
     {
@@ -76,6 +81,4 @@ class AppRoot extends Root
         $this->FILE = __FILE__;
         $this->Connect();
     }
-
-
 }

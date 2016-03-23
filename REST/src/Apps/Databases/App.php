@@ -29,7 +29,33 @@ class App extends AppRoot
      */
     public function TEST()
     {
-        $return = $this->MySQL()->SELECT("*", "testi");
+        /*$where = array(
+            array("column" => "aas", "operator" => "<=", "value" => 6),
+            array("column" => "asa", "value" => 0, "conjunction" => "OR")
+        );*/
+        //$return = array();
+        //$columns = "*";
+        //$table = "testi";
+        //$where = false;
+        //$where = array("nimi" => "testila");
+        //$order = array("hinta"=>"DESC");
+        //$limit = 1;
+        //$query = new MySQLQuery();
+        //$ok = $query->setSelect($columns, $table, $where, $order, $limit);
+        /*if($ok)
+        {
+            $return = $this->MySQL()->CALL($query);
+        }*/
+
+
+        //$query = new MySQLQuery();
+        //$query->setUpdate("testi", array("nimi"=>"lol", "hinta"=> 600), array("testiID"=>1));
+        //$this->MySQL()->CALL($query);
+        $testi = new Testi(15);
+        $return = $testi->Values();
+
+
+
         DATA::setSuccess(Checker::isArray($return));
         return $return;
     }

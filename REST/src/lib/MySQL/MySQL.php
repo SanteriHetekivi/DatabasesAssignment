@@ -37,7 +37,7 @@ class MySQL extends Root
     private function setConn($conn)
     {
         $success = false;
-        if($this->isObject($conn, "PDO", __FUNCTION__))
+        if($this->isObject($conn, "PDO", $this->ERROR_INFO(__FUNCTION__)))
         {
             $this->conn = $conn;
             $success = true;
@@ -83,9 +83,10 @@ class MySQL extends Root
     private function CONNECT($address, $database, $username, $password)
     {
         $success = false;
+        $errorInfo = $this->ERROR_INFO(__FUNCTION__);
         //If all variables are set
-        if(Checker::isString($address, true) && Checker::isString($database, true) &&
-            Checker::isString($username, true) && Checker::isString($password))
+        if(Checker::isString($address, true, $errorInfo) && Checker::isString($database, true, $errorInfo) &&
+            Checker::isString($username, true, $errorInfo) && Checker::isString($password, true, $errorInfo))
         {
             try
             {
@@ -98,10 +99,6 @@ class MySQL extends Root
                 $this->addError(__FUNCTION__, "Connection to data space failed!", $e->getMessage());
                 $conn = null;
             }
-        }
-        else
-        {
-            $this->addError(__FUNCTION__, "Passed values are not set!", array($address, $database,$username, $password));
         }
 
         return $success;
@@ -130,7 +127,7 @@ class MySQL extends Root
      * @param bool|string $addErrorFunction Function name if error is wanted.
      * @return bool Was there connection.
      */
-    private function checkConnection($addErrorFunction = false)
+    public function checkConnection($addErrorFunction = false)
     {
         $success = Checker::isObject($this->Conn(), "PDO");
         if($addErrorFunction && $success === false) $this->addError($addErrorFunction,
@@ -141,60 +138,50 @@ class MySQL extends Root
     /**
      * Function CALL
      * for sending MySQL queries to database.
-     * @param string $sql MySQL query.
-     * @return array|bool Result of the query, or false if there was exeptions.
+     * @param MySQLQuery $query MySQLQuery to run.
+     * @param bool $onlyOne Return only one row.
+     * @return array|bool Result of the query, or false if there was exceptions.
      */
-    private function CALL($sql)
+    public function CALL($query, $onlyOne = false)
     {
         $result = false;
-
-        if(Checker::isString($sql, true))
+        if($this->isObject($query, "MySQLQuery", __FUNCTION__))
         {
-            if($this->checkConnection(__FUNCTION__))
-            {
-                try
-                {
-                    $stmt = $this->Conn()->prepare($sql);
-                    $result = $stmt->execute();
-                    if(Checker::Contains($sql, "SELECT")) $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                }
-                catch(PDOException $e)
-                {
-                    $result = false;
-                    $this->addError(__FUNCTION__, "SQL command failed.", $e->getMessage());
+            $data = $query->Query();
+            $errorInfo = $this->ERROR_INFO(__FUNCTION__);
+            if(Checker::isArray($data, false, $errorInfo) &&
+                Checker::isString($data[Where::QUERY], false, $errorInfo) &&
+                Checker::isArray($data[Where::VALUES], true, $errorInfo)) {
+                $values = $data[Where::VALUES];
+                $sql = $data[Where::QUERY];
+                //d(array("query" => $sql, "Values" => $values));
+                if ($this->checkConnection(__FUNCTION__)) {
+                    try {
+                        $stmt = $this->Conn()->prepare($sql);
+                        if (Checker::isArray($values, false)) {
+                            foreach ($values as $key => &$value) {
+                                $stmt->bindParam($key, $value);
+                            }
+                        }
+                        $result = $stmt->execute();
+                        if ($query->Action() === "SELECT"){
+                            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                            if($onlyOne && Checker::isArray($result,false, $errorInfo)) $result = current($result);
+                        }
+                        elseif($query->Action() === "INSERT")
+                        {
+                            $result = $this->Conn()->lastInsertId();
+                            var_dump($result);
+                        }
+
+                    } catch (PDOException $e) {
+                        $result = false;
+                        $this->addError(__FUNCTION__, "SQL command failed.", $e->getMessage());
+                    }
                 }
             }
         }
 
         return $result;
-    }
-
-    /**
-     * Function SELECT
-     * for making SELECT query to database.
-     * @param string|array $columns Columns for the query.
-     * @param string $table Table for the query.
-     * @return bool|string|array Response from the database if successful false if not.
-     */
-    public function SELECT($columns = "*", $table )
-    {
-        $return = false;
-        $sql = MySQLParser::Select($columns, $table);
-        if($sql)
-        {
-            $return = $this->CALL($sql);
-        }
-        return $return;
-    }
-
-    public function INSERT($columns, $table)
-    {
-        //TODO: Complete
-    }
-
-    public function hasId($id, $table)
-    {
-        $column = $table."Id";
-        //TODO: Complete
     }
 }

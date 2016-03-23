@@ -14,6 +14,13 @@
 class DATA
 {
     /**
+     * Function ERROR_INFO
+     * for making ERROR_INFO data.
+     * @param string $FUNCTION Name of the function.
+     * @return array ERROR_INFO data.
+     */
+    private static function ERROR_INFO($FUNCTION){ return array(Err::FILE => __FILE__, Err::FUNC => $FUNCTION); }
+    /**
      * @var bool Was operation successful.
      */
     private static $success = false;
@@ -37,7 +44,7 @@ class DATA
     public static function setSuccess($_success)
     {
         $success = false;
-        if(Checker::isBool($_success))
+        if(Checker::isBool($_success, self::ERROR_INFO(__FUNCTION__)))
         {
             DATA::$success = $_success;
             $success = true;

@@ -11,7 +11,7 @@ class User extends MySQLObject
 
     protected function INITIALIZE()
     {
-        $this->setTable("user");
+        $this->setTable("usergroup");
         $columns = array(
             new MySQLColumn($this->IdName(), 0, "id"),
             new MySQLColumn("username", "", "VARCHAR"),
@@ -21,7 +21,6 @@ class User extends MySQLObject
             new MySQLColumn("email", "", "VARCHAR"),
             new MySQLColumn("removed", false, "BOOL"),
         );
-        $linkedObjects =
         $this->setColumns($columns);
     }
 }

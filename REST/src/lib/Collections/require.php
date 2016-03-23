@@ -2,21 +2,20 @@
 /**
  * Created by IntelliJ IDEA.
  * User: Santeri Hetekivi
- * Date: 16.3.2016
- * Time: 17.44
+ * Date: 12.3.2016
+ * Time: 12.24
  */
 
 /**
- * Require file for directory /src/Apps/Databases
+ * Require file for directory /libs/Collections
  */
 
 /**
  * Filenames to require in this directory.
  */
 $files = array(
-    "Setup",
-    "PRIVATE",
-    "App",
+    "ErrorCollection",
+    "MessageCollection",
 );
 
 /**
@@ -34,7 +33,6 @@ if(empty($files) === false)
  * Directories to require in this directory.
  */
 $directories = array(
-    "Objects"
 );
 
 /**

@@ -292,6 +292,11 @@ class MySQLQuery extends Root
         return $return;
     }
 
+    /**
+     * Function Insert
+     * for making insert query.
+     * @return bool|array Array containing MySQL query and values array.
+     */
     private function Insert()
     {
         $return = false;
@@ -314,6 +319,11 @@ class MySQLQuery extends Root
         return $return;
     }
 
+    /**
+     * Function Update
+     * for making update query.
+     * @return bool|array Array containing MySQL query and values array.
+     */
     private function Update()
     {
         $return = false;
@@ -363,7 +373,14 @@ class MySQLQuery extends Root
 
         return $action && $table && $columns && $where && $order && $limit;
     }
-    
+
+    /**
+     * Function setInsert
+     * for setting values for Select query.
+     * @param string $table Table name
+     * @param array $values Values for columns.
+     * @return bool Was setting values for insert query successful.
+     */
     public function setInsert($table, $values)
     {
         $action = $this->setAction("INSERT");
@@ -372,6 +389,14 @@ class MySQLQuery extends Root
         return $action && $table && $values;
     }
 
+    /**
+     * Function setUpdate
+     * for setting values for Update query.
+     * @param string $table Table name
+     * @param array $values Values for columns.
+     * @param string|array $where Where data for query.
+     * @return bool Was setting values for insert query successful.
+     */
     public function setUpdate($table, $values, $where)
     {
         $action = $this->setAction("UPDATE");
@@ -380,5 +405,4 @@ class MySQLQuery extends Root
         $where = $this->setWhere($where);
         return $action && $table && $values && $where;
     }
-
 }

@@ -22,6 +22,12 @@ class AppRoot extends MySQLRoot
         $this->FILE = __FILE__;
     }
 
+    /**
+     * Function GET
+     * for getting values.
+     * @param array $pars Key: par0 = Object name, Key: par1 Id of object (Optional)
+     * @return array Values for given column and id if set.
+     */
     public function GET($pars)
     {
         $errorInfo = $this->ERROR_INFO(__FUNCTION__);
@@ -31,16 +37,21 @@ class AppRoot extends MySQLRoot
             $object = $pars["par0"];
             if(Checker::isString($object, false, $errorInfo)) {
                 if (class_exists($object)) {
-                    if (isset($pars["par1"])) {
-                        $id = Parser::Int($pars["par1"], $errorInfo);
-                        if (MySQLChecker::isId($id, $errorInfo)) {
-                            $obj = new $object($id);
-                            $return = $obj->Values();
+                    $obj = new $object();
+                    if(Checker::isObject($obj, false, "MySQLObject", $errorInfo))
+                    {
+                        if (isset($pars["par1"])) {
+                            $id = Parser::Int($pars["par1"], $errorInfo);
+                            if (MySQLChecker::isId($id, $errorInfo)) {
+                                $obj->setID($id);
+                                $obj->SELECT();
+                                $return = $obj->Values();
+                            }
+                        } else {
+                            $return = $obj->GetAllValues();
                         }
-                    } else {
-                        $obj = new $object();
-                        $return = $obj->GetAllValues();
                     }
+
                 } else $this->addError(__FUNCTION__, "No class with given name!", $object);
             }
         }
@@ -49,17 +60,34 @@ class AppRoot extends MySQLRoot
     }
 
 
+    /**
+     * Function CALL
+     * for making function calls.
+     * @param $action
+     * @param $pars
+     * @return array
+     */
     public function CALL($action, $pars)
     {
         $errorInfo = $this->ERROR_INFO(__FUNCTION__);
         $return  = array();
-        if(Checker::isString($action, false, $errorInfo) &&  method_exists($this, $action) && is_callable(array($this, $action)))
+        if(Checker::isString($action, false, $errorInfo) &&  method_exists($this, $action) &&
+            is_callable(array($this, $action)) && $this->AUTHENTICATE())
         {
             $return = $this->$action($pars);
         }
         return $return;
     }
 
+    /**
+     * Function AUTHENTICATE
+     * for authenticating call.
+     * @return bool Was authentication successful.
+     */
+    protected function AUTHENTICATE()
+    {
+        return false;
+    }
 
 
 }

@@ -126,7 +126,7 @@ class MessageCollection
     public static function addMessageObject($message)
     {
         $success = true;
-        if(Checker::isObject($message, "Message", self::ERROR_INFO(__FUNCTION__)))
+        if(Checker::isObject($message, "Message", false, self::ERROR_INFO(__FUNCTION__)))
         {
             MessageCollection::$messages[] = $message;
             $success = true;

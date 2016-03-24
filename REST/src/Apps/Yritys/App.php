@@ -42,12 +42,17 @@ class App extends AppRoot
             $id = Parser::Int($pars["par0"], $errorInfo);
             if(MySQLChecker::isId($id, $errorInfo))
             {
-                $tekee = new Tekee();
-                $return = $tekee->getEmployees($id);
+                $projekti = new Projekti($id);
+                $return = $projekti->getEmployeeValues();
                 d($return);
             }
         }
         DATA::setSuccess((Checker::isArray($return)));
         return $return;
+    }
+
+    protected function AUTHENTICATE()
+    {
+        return true;
     }
 }

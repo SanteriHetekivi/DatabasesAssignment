@@ -21,8 +21,18 @@ class OrderBy
      */
     private static function ERROR_INFO($FUNCTION){ return array(Err::FILE => __FILE__, Err::FUNC => $FUNCTION); }
 
+    /**
+     * Supported keywords.
+     */
     const KEYWORDS = array("ASC", "DESC");
 
+    /**
+     * Function MAKE
+     * for making OrderBy query.
+     * @param string|array $order Values for making order.
+     * @param string $keyword Keyword for order. (Optional)
+     * @return bool|string OrderBy query string or false if there were errors.
+     */
     public static function MAKE($order, $keyword="ASC")
     {
         $return = false;
@@ -44,6 +54,14 @@ class OrderBy
         return $return;
     }
 
+    /**
+     * Function MAKEFromString
+     * for making order by query from string.
+     * @param string $column Column name.
+     * @param string $keyword Keyword for query. (Optional)
+     * @param bool $first Is query first one. (Optional)
+     * @return bool|string Query or false if there were error.
+     */
     private static function MAKEFromString($column, $keyword="ASC", $first = true)
     {
         $return = false;
@@ -58,6 +76,12 @@ class OrderBy
         return $return;
     }
 
+    /**
+     * Function MAKEFromArray
+     * for making order by query from array.
+     * @param array $orders Order command array.
+     * @return bool|string Query or false if there were error.
+     */
     private static function MAKEFromArray($orders)
     {
         $return = false;

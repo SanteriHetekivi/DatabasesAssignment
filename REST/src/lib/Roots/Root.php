@@ -58,19 +58,22 @@ class Root
 
     /**
      * Function isObject
-     * for checking if given object
-     * is object and correct one.
-     * @param object $obj Object to test.
-     * @param string $option Name of object.
+     * for checking if given variable is object and
+     * if $options is array or string also is that object's classname in options
+     * @param object $obj Variable to test.
+     * @param string $option Allowed class.
+     * @param bool|string $parent Allowed parent. (Optional)
      * @param bool|string $addErrorFunction Name of function for error. (Optional)
-     * @return bool Did given object pass checks.
+     * @return bool Result of the check.
      */
-    protected function isObject($obj, $option, $addErrorFunction = false)
+    protected function isObject($obj, $option, $parent = false, $addErrorFunction = false)
     {
-        $success = Checker::isObject($obj,$option);
+        $success = Checker::isObject($obj, $option, $parent);
         if($success == false && Checker::isString($addErrorFunction) && Checker::isString($option))
         {
-            $this->addError($addErrorFunction, "Given object was not $option!", $obj);
+            $message = "Given object was not $option";
+            $message .= ($parent)?" and/or $parent 's child!":"!";
+            $this->addError($addErrorFunction, $message,  $obj);
         }
         return $success;
     }

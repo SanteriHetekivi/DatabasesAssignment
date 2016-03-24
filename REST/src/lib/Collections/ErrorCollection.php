@@ -122,7 +122,7 @@ class ErrorCollection
     public static function addErr($error)
     {
         $success = true;
-        if(Checker::isObject($error, "Err", self::ERROR_INFO(__FUNCTION__)))
+        if(Checker::isObject($error, "Err", false, self::ERROR_INFO(__FUNCTION__)))
         {
             ErrorCollection::$errors[] = $error;
             $success = true;

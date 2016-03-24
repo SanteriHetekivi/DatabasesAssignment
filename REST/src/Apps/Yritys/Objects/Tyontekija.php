@@ -13,13 +13,13 @@ class Tyontekija extends MySQLObject
     {
         $this->setTable("Tyontekija");
         $columns = array(
-            new MySQLColumn($this->IdName(), 0, "id"),
+            new MySQLColumn($this->IdName(), 0, "ID"),
             new MySQLColumn("Etunimi", "", "VARCHAR"),
             new MySQLColumn("Sukunimi", "", "VARCHAR"),
             new MySQLColumn("Palkka", "", "VARCHAR"),
             new MySQLColumn("Syntymaaika", "", "VARCHAR"),
             new MySQLColumn("Email", "", "VARCHAR"),
-            new MySQLColumn("Osasto", 0, "id", new Osasto()),
+            new MySQLColumn("Osasto", 0, "ID", new Osasto()),
         );
         $this->setColumns($columns);
     }

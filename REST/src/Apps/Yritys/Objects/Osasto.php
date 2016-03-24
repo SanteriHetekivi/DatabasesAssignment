@@ -13,7 +13,7 @@ class Osasto extends MySQLObject
     {
         $this->setTable("Osasto");
         $columns = array(
-            new MySQLColumn($this->IdName(), 0, "id"),
+            new MySQLColumn($this->IdName(), 0, "ID"),
             new MySQLColumn("OsastoNimi", "", "VARCHAR"),
         );
         $this->setColumns($columns);

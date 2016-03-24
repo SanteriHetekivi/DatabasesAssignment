@@ -37,7 +37,7 @@ class MySQL extends Root
     private function setConn($conn)
     {
         $success = false;
-        if($this->isObject($conn, "PDO", $this->ERROR_INFO(__FUNCTION__)))
+        if($this->isObject($conn, "PDO", false, $this->ERROR_INFO(__FUNCTION__)))
         {
             $this->conn = $conn;
             $success = true;
@@ -129,7 +129,7 @@ class MySQL extends Root
      */
     public function checkConnection($addErrorFunction = false)
     {
-        $success = Checker::isObject($this->Conn(), "PDO");
+        $success = Checker::isObject($this->Conn(), "PDO", false);
         if($addErrorFunction && $success === false) $this->addError($addErrorFunction,
             "Connection is not set!", $this->Conn());
         return $success;
@@ -145,7 +145,7 @@ class MySQL extends Root
     public function CALL($query, $onlyOne = false)
     {
         $result = false;
-        if($this->isObject($query, "MySQLQuery", __FUNCTION__))
+        if($this->isObject($query, "MySQLQuery", false, __FUNCTION__))
         {
             $data = $query->Query();
             $errorInfo = $this->ERROR_INFO(__FUNCTION__);

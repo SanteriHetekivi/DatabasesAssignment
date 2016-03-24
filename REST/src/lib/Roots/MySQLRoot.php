@@ -37,7 +37,7 @@ class MySQLRoot extends Root
     private function setMySQL($mysql)
     {
         $success = false;
-        if($this->isObject($mysql, "MySQL", __FUNCTION__))
+        if($this->isObject($mysql, "MySQL", false, __FUNCTION__))
         {
             $this->mysql = $mysql;
             $success = true;
@@ -67,9 +67,16 @@ class MySQLRoot extends Root
         return $success;
     }
 
+    /**
+     * Function Connected
+     * for checking if object
+     * is connected to MySQL database.
+     * @param bool|string $errorFunction Error's function name. (Optional)
+     * @return bool Is object connected to MySQL database.
+     */
     public function Connected($errorFunction = false)
     {
-        return $this->isObject($this->MySQL(), "MySQL", $errorFunction) && $this->MySQL()->checkConnection($errorFunction);
+        return $this->isObject($this->MySQL(), "MySQL", false, $errorFunction) && $this->MySQL()->checkConnection($errorFunction);
     }
 
     /**

@@ -12,8 +12,8 @@ class Tekee extends MySQLObject
     {
         $this->setTable("Tekee");
         $columns = array(
-            new MySQLColumn("TyontekijaID", 0, "id", new Tyontekija()),
-            new MySQLColumn("ProjektiID", 0, "id", new Projekti()),
+            new MySQLColumn("TyontekijaID", 0, "ID", new Tyontekija()),
+            new MySQLColumn("ProjektiID", 0, "ID", new Projekti()),
             new MySQLColumn("Tunnit", "0", "VARCHAR"),
         );
         $this->setIdNames(array("TyontekijaID", "ProjektiID"));
@@ -30,12 +30,28 @@ class Tekee extends MySQLObject
             foreach($obs as $ob)
             {
                 $employee = $ob->Value("TyontekijaID", true);
-                if($this->isObject($employee, "Tyontekija", __FUNCTION__))
+                if($this->isObject($employee, "Tyontekija", false, __FUNCTION__))
                 {
-                    $employees[$employee->ID()] = $employee->Values(true);
+                    $employees[$employee->ID()] = $employee;
                 }
             }
             if(count($employees) === count($obs)) $return = $employees;
+        }
+        return $return;
+    }
+
+    public function GetEmployeeValues($ProjektiID)
+    {
+        $return = false;
+        $employees = $this->GetEmployees($ProjektiID);
+        if(Checker::isArray($employees, true, $this->ERROR_INFO(__FUNCTION__)))
+        {
+            $employeeValues = array();
+            foreach($employees as $employee)
+            {
+                $employeeValues[$employee->ID()] = $employee->Values(true);
+            }
+            if(count($employeeValues) === count($employees)) $return = $employeeValues;
         }
         return $return;
     }

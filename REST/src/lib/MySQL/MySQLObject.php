@@ -15,13 +15,27 @@
 class MySQLObject extends MySQLRoot
 {
 
+    /**
+     * @var string Name of the table.
+     */
     private $table;
 
+    /**
+     * Function Table
+     * for getting table name.
+     * @return string Name of the table.
+     */
     public function Table()
     {
         return $this->table;
     }
 
+    /**
+     * Function setTable
+     * for setting table name
+     * @param string $table Table name.
+     * @return bool Success of the function.
+     */
     protected function setTable($table)
     {
         $success = false;
@@ -33,8 +47,16 @@ class MySQLObject extends MySQLRoot
         return $success;
     }
 
+    /**
+     * @var array Columns for MySQLColumns.
+     */
     private $columns;
 
+    /**
+     * Function Columns
+     * for getting array of MySQLColumns.
+     * @return array
+     */
     public function Columns()
     {
         return $this->columns;
@@ -49,7 +71,7 @@ class MySQLObject extends MySQLRoot
     public function setColumn($column)
     {
         $success = false;
-        if($this->isObject($column, "MySQLColumn", __FUNCTION__))
+        if($this->isObject($column, "MySQLColumn", false, __FUNCTION__))
         {
             $this->columns[$column->Name()] = $column;
             $success = true;
@@ -57,6 +79,12 @@ class MySQLObject extends MySQLRoot
         return $success;
     }
 
+    /**
+     * Function setColumns
+     * for setting array of MySQLColumns.
+     * @param array $columns Array of MySQLColumns.
+     * @return bool Success of the function.
+     */
     public function setColumns($columns)
     {
         $success = false;
@@ -72,11 +100,18 @@ class MySQLObject extends MySQLRoot
         return $success;
     }
 
+    /**
+     * Function value
+     * for getting columns values.
+     * @param string $name Name of column.
+     * @param bool $linked Get linked object if is set.
+     * @return null|string|int|object|bool Value for column or null.
+     */
     public function Value($name, $linked = false)
     {
-        $return = NULL;
+        $return = null;
         if(Checker::isString($name, false, $this->ERROR_INFO(__FUNCTION__)) && isset($this->columns[$name]) &&
-            $this->isObject($this->columns[$name], "MySQLColumn", __FUNCTION__))
+            $this->isObject($this->columns[$name], "MySQLColumn", false, __FUNCTION__))
         {
             $column = $this->columns[$name];
             if($linked && $column->Linked())
@@ -88,6 +123,12 @@ class MySQLObject extends MySQLRoot
         return $return;
     }
 
+    /**
+     * Function Values
+     * for getting values for columns.
+     * @param bool $linked Get linked object's values if is set.
+     * @return array Values for columns.
+     */
     public function Values($linked = false)
     {
         $return = array();
@@ -96,7 +137,7 @@ class MySQLObject extends MySQLRoot
         {
             foreach($columns as $name => $column)
             {
-                if($this->isObject($column, "MySQLColumn", __FUNCTION__))
+                if($this->isObject($column, "MySQLColumn", false, __FUNCTION__))
                 {
                     if($linked && $column->Linked())
                     {
@@ -109,6 +150,13 @@ class MySQLObject extends MySQLRoot
         return $return;
     }
 
+    /**
+     * Function setValue
+     * for setting value of column.
+     * @param string $name Name of column.
+     * @param string|int|object|bool $value Value for column.
+     * @return bool Success of the function.
+     */
     public function setValue($name, $value)
     {
         $success = false;
@@ -116,7 +164,7 @@ class MySQLObject extends MySQLRoot
         if(Checker::isString($name, false, $errorInfo))
         {
             if(strtolower($name) === "id") $success = $this->setID($value);
-            elseif(isset($this->columns[$name]) && $this->isObject($this->columns[$name], "MySQLColumn", __FUNCTION__))
+            elseif(isset($this->columns[$name]) && $this->isObject($this->columns[$name], "MySQLColumn", false, __FUNCTION__))
             {
                 $success = $this->columns[$name]->setValue($value);
             }
@@ -124,6 +172,12 @@ class MySQLObject extends MySQLRoot
         return $success;
     }
 
+    /**
+     * Function setValues
+     * for setting columns values.
+     * @param array $values Containing name value pairs.
+     * @return bool Success of the function.
+     */
     public function setValues($values)
     {
         $success = false;
@@ -138,16 +192,29 @@ class MySQLObject extends MySQLRoot
         return $success;
     }
 
+    /**
+     * @var bool|array Names of id columns.
+     */
     private $idNames;
 
+    /**
+     * Function IdNames
+     * for getting id arrays.
+     * @return array Containing all idNames.
+     */
     public function IdNames()
     {
-        $return  = false;
         if(Checker::isArray($this->idNames, false)) $return = $this->idNames;
         else $return = array($this->IdName());
         return $return;
     }
 
+    /**
+     * Function setIdNames
+     * for setting idNames
+     * @param array|string $idNames Id name/s for table.
+     * @return bool Success of the function.
+     */
     public function setIdNames($idNames)
     {
         $success = false;
@@ -169,9 +236,13 @@ class MySQLObject extends MySQLRoot
         return $success;
     }
 
+    /**
+     * Function IdName
+     * for getting name of id column.
+     * @return string Name of id column.
+     */
     public function IdName()
     {
-        $return = false;
         if(isset($this->idNames[0]) && Checker::isString($this->idNames[0], false, $this->ERROR_INFO(__FUNCTION__)))
         {
             $return  = $this->idNames[0];
@@ -180,11 +251,21 @@ class MySQLObject extends MySQLRoot
         return $return;
     }
 
+    /**
+     * Function ID
+     * for getting id.
+     * @return bool|int Id or false if there were error.
+     */
     public function ID()
     {
         return $this->Value($this->IdName());
     }
 
+    /**
+     * Function IDs
+     * for getting id values.
+     * @return array|bool Id values or false if there were error.
+     */
     public function IDs()
     {
         $return = false;
@@ -214,6 +295,12 @@ class MySQLObject extends MySQLRoot
         return $return;
     }
 
+    /**
+     * Function setID
+     * for setting id to value.
+     * @param int $value Value for id.
+     * @return bool Success of the function.
+     */
     public function setID($value)
     {
         return $this->setValue($this->IdName(), $value);
@@ -221,7 +308,7 @@ class MySQLObject extends MySQLRoot
 
     /**
      * MySQLObject constructor.
-     * @param bool|int|array $values Values for class or id as int.
+     * @param bool|int|array $values Values for class or id as int (Optional).
      */
     public function __construct($values = false)
     {
@@ -249,6 +336,12 @@ class MySQLObject extends MySQLRoot
         }
     }
 
+    /**
+     * Function SELECT
+     * for selecting values from
+     * MySQL database by ids.
+     * @return bool Success of the function.
+     */
     public function SELECT()
     {
         $success = false;
@@ -271,6 +364,10 @@ class MySQLObject extends MySQLRoot
         return $success;
     }
 
+    /**
+     * Function INITIALIZE
+     * for setting values for object.
+     */
     protected function INITIALIZE()
     {
 
@@ -282,8 +379,20 @@ class MySQLObject extends MySQLRoot
     public function __destruct()
     {
         parent::__destruct();
+        unset($this->idNames);
+        unset($this->columns);
+        unset($this->table);
     }
 
+    /**
+     * Function GetAll
+     * for getting all object of
+     * same object.
+     * @param bool|array $where Where query for search. (Optional)
+     * @param array|bool|string $order Order string or array. (Optional)
+     * @param bool|int $limit Limit for query. (Optional)
+     * @return array|bool Objects or false if there were error.
+     */
     public function GetAll($where = false, $order = false, $limit = false)
     {
         $return = false;
@@ -293,7 +402,6 @@ class MySQLObject extends MySQLRoot
         if($queryOK)
         {
             $rows = $this->MySQL()->CALL($query);
-            //d($rows);
             if(Checker::isArray($rows, false, $errorInfo))
             {
                 $classes = array();
@@ -306,7 +414,6 @@ class MySQLObject extends MySQLRoot
                         foreach ($row as $idName => $id) {
                             $success = $obj->setValue($idName, $id) && $success;
                         }
-
                         if ($success)
                         {
                             $obj->SELECT();
@@ -321,6 +428,15 @@ class MySQLObject extends MySQLRoot
         return $return;
     }
 
+    /**
+     * Function GetAllValues
+     * for getting values for object
+     * of same type.
+     * @param bool|array $where Where query for search. (Optional)
+     * @param array|bool|string $order Order string or array. (Optional)
+     * @param bool|int $limit Limit for query. (Optional)
+     * @return array|bool Values or false if there were error.
+     */
     public function GetAllValues($where = false, $order = false, $limit = false)
     {
         $return = false;

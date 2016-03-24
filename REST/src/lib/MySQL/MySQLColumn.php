@@ -13,7 +13,7 @@ class MySQLColumn extends Root
      */
     const SUPPORTED_TYPES = array(
         "VARCHAR",
-        "id",
+        "ID",
         "BOOL"
     );
 
@@ -64,8 +64,8 @@ class MySQLColumn extends Root
     {
         $type = $this->Type();
         $value = $this->value;
-        if($type === "id") $value = Parser::Int($value);
-        if($type === "bool") $value = (bool)$value;
+        if($type === "ID") $value = Parser::Int($value);
+        if($type === "BOOL") $value = (bool)$value;
         return $value;
     }
 
@@ -127,17 +127,32 @@ class MySQLColumn extends Root
         return $success;
     }
 
+    /**
+     * @var object|bool Linked object for value.
+     */
     private $linked;
 
+    /**
+     * Function Linked
+     * for getting values
+     * linked object.
+     * @return bool|object Linked object for value or false if not set.
+     */
     public function Linked()
     {
         return $this->linked;
     }
 
+    /**
+     * Function setLinked
+     * for setting linked MySQLObject's child.
+     * @param object $object Object to set.
+     * @return bool Success of the function.
+     */
     public function setLinked($object)
     {
         $success = false;
-        if(Checker::isObject($object, false, $this->ERROR_INFO(__FUNCTION__)))
+        if(Checker::isObject($object, false, "MySQLObject", $this->ERROR_INFO(__FUNCTION__)))
         {
             $this->linked = $object;
             $success = true;
@@ -148,9 +163,10 @@ class MySQLColumn extends Root
 
     /**
      * MySQLColumn constructor.
-     * @param string $name  Name of column.
+     * @param string $name Name of column.
      * @param string|bool|int|double $value Value for column.
-     * @param string $type Type of column.
+     * @param string $type Type of column. (Optional)
+     * @param bool|object $linked MySQLObject's child to link. (Optional)
      */
     public function __construct($name, $value, $type = "VARCHAR", $linked = false)
     {
@@ -160,6 +176,7 @@ class MySQLColumn extends Root
         $this->setValue($value);
         $this->setType($type);
         if($linked) $this->setLinked($linked);
+        else $this->linked = false;
     }
 
     /**
@@ -169,23 +186,37 @@ class MySQLColumn extends Root
     {
         parent::__destruct();
         unset($this->type);
-
+        unset($this->name);
+        unset($this->value);
+        unset($this->linked);
     }
 
     public function CHECK($value=NULL)
     {
         if($value === NULL) $value = $this->value;
-        return true;
+        $success = false;
+        $errorInfo = $this->ERROR_INFO(__FUNCTION__);
+        $type = $this->Type();
+        if($type === "ID") $success = Checker::isInt($value, true, true, $errorInfo);
+        elseif($type === "VARCHAR") $success = Checker::isString($value, true, $errorInfo);
+        elseif($type === "BOOL")    $success = Checker::isBool($value, $errorInfo);
+        else $success = true;
+        return $success;
     }
 
-    private function PARSE($value)
+    private function PARSE($value = null)
     {
         $return = false;
+        if(is_null($value)) $value = $this->value;
+        $type = $this->type;
+        $errorInfo = $this->ERROR_INFO(__FUNCTION__);
+        if($type === "ID") $value = Parser::Int($value, $errorInfo);
+        elseif($type === "BOOL") $value = Parser::Bool($value, $errorInfo);
+        elseif($type === "VARCHAR") $value = Parser::String($value, $errorInfo);
         if($this->CHECK($value))
         {
-            $type = $this->type;
             if($type == "BOOL") $value = ($value)?"1":"0";
-            $value = (string)$value;
+            $value = Parser::String($value);
             $return = $value;
         }
         return $return;

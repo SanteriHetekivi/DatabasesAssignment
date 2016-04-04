@@ -120,7 +120,6 @@ class AppRoot extends MySQLRoot
         $return  = array();
         $object = $this->getObject($pars);
         $id = $this->getId($pars);
-
         if($object && $id)
         {
             $object->setID($id);

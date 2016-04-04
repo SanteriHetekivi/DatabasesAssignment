@@ -164,14 +164,21 @@ class MySQL extends Root
                             }
                         }
                         $result = $stmt->execute();
-                        if ($query->Action() === "SELECT"){
-                            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                            if($onlyOne && Checker::isArray($result,false, $errorInfo)) $result = current($result);
-                        }
-                        elseif($query->Action() === "INSERT")
+                        if($result !== false)
                         {
-                            $result = $this->Conn()->lastInsertId();
-                            var_dump($result);
+                            if ($query->Action() === "SELECT")
+                            {
+                                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                if(Checker::isArray($result,false))
+                                {
+                                    if($onlyOne) $result = current($result);
+                                }
+                                else $result = false;
+                            }
+                            elseif($query->Action() === "INSERT")
+                            {
+                                $result = $this->Conn()->lastInsertId();
+                            }
                         }
 
                     } catch (PDOException $e) {

@@ -146,7 +146,6 @@ class MySQLParser
         $errorInfo = self::ERROR_INFO(__FUNCTION__);
         if(Checker::isArray($values, false, $errorInfo))
         {
-            echo "<br><br>".var_dump($values)."<br>";
             $query = array();
             foreach($values as $column => $value)
             {
@@ -159,7 +158,15 @@ class MySQLParser
                     $query[Where::VALUES][$name] = $value;
                 }
             }
-            if(count($values) === count($query)) $return = $query;
+            if(isset($query[MySQLQuery::COLUMNS]) && isset($query[Where::VALUES])
+                && count($values) === count($query[MySQLQuery::COLUMNS])) $return = $query;
+            else
+            {
+                var_dump($values);
+                echo "<br><br>";
+                var_dump($query);
+                die("");
+            }
         }
         return $return;
     }

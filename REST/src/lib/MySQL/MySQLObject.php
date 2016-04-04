@@ -346,23 +346,165 @@ class MySQLObject extends MySQLRoot
     {
         $success = false;
         $ids = $this->IDs();
-        if(MySQLChecker::isArray($ids) && $this->Connected(__FUNCTION__))
+        if($this->Connected(__FUNCTION__))
         {
+
+            if(MySQLChecker::isArray($ids)) $where = $ids;
+            else $where = $this->Values(false);
             $query = new MySQLQuery();
-            $queryOK = $query->setSelect("*", $this->Table(), $ids);
+            $queryOK = $query->setSelect("*", $this->Table(), $where);
             if($queryOK)
             {
                 $values = $this->MySQL()->CALL($query, true);
-                $success = $this->setValues($values);
-           }
+                if(Checker::isArray($values))
+                {
+                    $success = $this->setValues($values);
+                }
+            }
             else
             {
                 $this->addError(__FUNCTION__, "Making Select query failed!", array("*", $this->Table(), $ids));
             }
         }
-        else $success = true;
         return $success;
     }
+
+    /**
+     * Function beforeCOMMIT
+     * for doing things before commit.
+     * @return bool Success of function.
+     */
+    protected function beforeCOMMIT()
+    {
+        return true;
+    }
+
+    /**
+     * Function COMMIT
+     * for committing object to database.
+     * @return bool Success of commit.
+     */
+    public function COMMIT()
+    {
+        $success = false;
+        if($this->beforeCOMMIT() && $this->Connected(__FUNCTION__) && $this->Check())
+        {
+            $query = new MySQLQuery();
+            $values = $this->Values(false);
+            // Update
+            if($this->inDatabase())
+            {
+                $ids = $this->IDs();
+                $queryOK = $query->setUpdate($this->Table(), $values,  $ids);
+            }
+            // Insert
+            else
+            {
+                if(isset($values[$this->IdName()])) unset($values[$this->IdName()]);
+                $queryOK = $query->setInsert($this->Table(), $values);
+            }
+            if($queryOK)
+            {
+                $queryResult = $this->MySQL()->CALL($query, true);
+                if($queryResult !== false)
+                {
+                    if($query->Action() === "INSERT")
+                    {
+                        $this->setID($queryResult);
+                    }
+                    $selectOk = $this->SELECT();
+                    $success = $selectOk && $this->afterCOMMIT();
+                }
+            }
+            else
+            {
+                $this->addError(__FUNCTION__, "Making query failed!", array($this->Table(), $values));
+            }
+        }
+        return $success;
+    }
+
+    /**
+     * Function afterCOMMIT
+     * for doing things after commit.
+     * @return bool Success of function.
+     */
+    protected function afterCOMMIT()
+    {
+        return true;
+    }
+
+    /**
+     * Function DELETE
+     * for deleting object from database.
+     */
+    public function DELETE()
+    {
+        $success = false;
+        $ids = $this->IDs();
+        if($this->Connected(__FUNCTION__))
+        {
+            if(MySQLChecker::isArray($ids)) $where = $ids;
+            else $where = $this->Values(false);
+            $query = new MySQLQuery();
+            $queryOK = $query->setDelete($this->Table(), $where);
+            if($queryOK)
+            {
+                $success = $this->MySQL()->CALL($query, true);
+            }
+            else
+            {
+                $this->addError(__FUNCTION__, "Making Select query failed!", array("*", $this->Table(), $ids));
+            }
+        }
+        return $success;
+    }
+
+    /**
+     * Function Check
+     * for checking every column.
+     * @return bool Result of the check.
+     */
+    private function Check()
+    {
+        $success = false;
+        $columns = $this->Columns();
+        if(Checker::isArray($columns, false))
+        {
+            $success = true;
+            foreach($columns as $name => $column)
+            {
+                $success = $column->CHECK() && $success;
+            }
+        }
+        return $success;
+    }
+
+    /**
+     * Function inDatabase
+     * for checking if object is in database.
+     * @return bool Is object in database.
+     */
+    public function inDatabase()
+    {
+        $success = false;
+        $ids = $this->IDs();
+        if($this->Connected(__FUNCTION__) && Checker::isArray($ids))
+        {
+            $query = new MySQLQuery();
+            $queryOK = $query->setSelect("*", $this->Table(), $ids);
+            if ($queryOK)
+            {
+                $values = $this->MySQL()->CALL($query, true);
+                if (Checker::isArray($values))
+                {
+                    $success = true;
+                }
+            }
+        }
+        return $success;
+    }
+
 
     /**
      * Function INITIALIZE

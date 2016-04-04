@@ -64,8 +64,8 @@ class MySQLColumn extends Root
     {
         $type = $this->Type();
         $value = $this->value;
-        if($type === "ID") $value = Parser::Int($value);
-        if($type === "BOOL") $value = (bool)$value;
+        if($type === "ID")      $value = Parser::Int($value);
+        if($type === "BOOL")    $value = (bool)$value;
         return $value;
     }
 
@@ -79,6 +79,7 @@ class MySQLColumn extends Root
     {
         $success = false;
         $value = $this->PARSE($value);
+        if($value === false) die($value);
         if(Checker::isString($value, true, $this->ERROR_INFO(__FUNCTION__)))
         {
             $this->value = $value;
@@ -191,13 +192,19 @@ class MySQLColumn extends Root
         unset($this->linked);
     }
 
+    /**
+     * Function CHECK
+     * for checking values.
+     * @param null|int|bool|string $value Value to test (Optional).
+     * @return bool Result of check.
+     */
     public function CHECK($value=NULL)
     {
-        if($value === NULL) $value = $this->value;
+        if($value === NULL) $value = $this->Value();
         $success = false;
         $errorInfo = $this->ERROR_INFO(__FUNCTION__);
         $type = $this->Type();
-        if($type === "ID") $success = Checker::isInt($value, true, true, $errorInfo);
+        if($type === "ID")          $success = Checker::isInt($value, true, true, $errorInfo);
         elseif($type === "VARCHAR") $success = Checker::isString($value, true, $errorInfo);
         elseif($type === "BOOL")    $success = Checker::isBool($value, $errorInfo);
         else $success = true;

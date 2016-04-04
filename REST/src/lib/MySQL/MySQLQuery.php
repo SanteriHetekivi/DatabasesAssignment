@@ -263,7 +263,7 @@ class MySQLQuery extends Root
         if($action === "SELECT")        $query = $this->Select();
         elseif($action === "INSERT")    $query = $this->Insert();
         elseif($action === "UPDATE")    $query = $this->Update();
-
+        elseif($action === "DELETE")    $query = $this->Delete();
         else $this->addError(__FUNCTION__, "Action not supported", $action);
         return $query;
     }
@@ -353,6 +353,25 @@ class MySQLQuery extends Root
     }
 
     /**
+     * Function Delete
+     * for making delete query.
+     * @return bool|array Array containing MySQL query and values array.
+     */
+    private function Delete()
+    {
+        $return = false;
+        $action = $this->Action();
+        $table = $this->Table();
+        $where = $this->Where();
+        if($action && $table && Checker::isArray($where, false) && isset($where[Where::VALUES]))
+        {
+            $return[Where::QUERY] = "$action FROM $table".$where[Where::QUERY];
+            $return[Where::VALUES] = $where[Where::VALUES];
+        }
+        return $return;
+    }
+
+    /**
      * Function setSelect
      * for setting values for Select query.
      * @param array|string $columns Columns to select.
@@ -404,5 +423,20 @@ class MySQLQuery extends Root
         $values = $this->setValues($values);
         $where = $this->setWhere($where);
         return $action && $table && $values && $where;
+    }
+
+    /**
+     * Function setDelete
+     * for setting values for Delete query.
+     * @param string $table Table name
+     * @param string|array $where Where data for query.
+     * @return bool Was setting values for delete query successful.
+     */
+    public function setDelete($table, $where)
+    {
+        $action = $this->setAction("DELETE");
+        $table = $this->setTable($table);
+        $where = $this->setWhere($where);
+        return $action && $table && $where;
     }
 }

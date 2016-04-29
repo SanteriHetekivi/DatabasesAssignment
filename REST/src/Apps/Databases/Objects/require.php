@@ -14,7 +14,15 @@
  * Filenames to require in this directory.
  */
 $files = array(
+    "Book",
+    "Borrow",
+    "Club",
+    "Demo",
+    "DemoItem",
+    "Item",
+    "Membership",
     "User",
+    "UserGroup",
 );
 
 /**

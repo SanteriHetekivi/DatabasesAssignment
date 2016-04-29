@@ -1,6 +1,7 @@
 <?php
 error_reporting(-1);
 ini_set('display_errors', 'On');
+date_default_timezone_set('Europe/Helsinki');
 if (PHP_SAPI == 'cli-server') {
     // To help the built-in PHP dev server, check if the request was actually for
     // something which should probably be served as a static file

@@ -43,6 +43,11 @@ function ParseCommand($args, $request)
     return $return;
 }
 
+function hasObject($app, $action)
+{
+    return (!method_exists($app, $action) || !is_callable(array($app, $action)));
+}
+
 $app->get('/{app}/{action}[/{par0}[/{par1}]]', function (RequestInterface $request, $response, $args) {
     $this->logger->info("Slim-Skeleton '/' route");
     $data = array();
@@ -53,7 +58,7 @@ $app->get('/{app}/{action}[/{par0}[/{par1}]]', function (RequestInterface $reque
         $app = $parsed["app"];
         $action = $parsed["action"];
         $pars = $parsed["pars"];
-        if(!method_exists($this, $action) || !is_callable(array($this, $action)))
+        if(hasObject($app, $action))
         {
             array_unshift($pars, $action);
             $action = "GET";
@@ -76,7 +81,7 @@ $app->post('/{app}/{action}[/{par0}[/{par1}]]', function (RequestInterface $requ
         $app = $parsed["app"];
         $action = $parsed["action"];
         $pars = $parsed["pars"];
-        if(!method_exists($app, $action) || !is_callable(array($app, $action)))
+        if(hasObject($app, $action))
         {
             array_unshift($pars, $action);
             $action = "ADD";
@@ -99,7 +104,7 @@ $app->put('/{app}/{action}[/{par0}[/{par1}]]', function (RequestInterface $reque
         $app = $parsed["app"];
         $action = $parsed["action"];
         $pars = $parsed["pars"];
-        if(!method_exists($this, $action) || !is_callable(array($this, $action)))
+        if(hasObject($app, $action))
         {
             array_unshift($pars, $action);
             $action = "UPDATE";
@@ -122,7 +127,7 @@ $app->delete('/{app}/{action}[/{par0}[/{par1}]]', function (RequestInterface $re
         $app = $parsed["app"];
         $action = $parsed["action"];
         $pars = $parsed["pars"];
-        if(!method_exists($this, $action) || !is_callable(array($this, $action)))
+        if(hasObject($app, $action))
         {
             array_unshift($pars, $action);
             $action = "DELETE";

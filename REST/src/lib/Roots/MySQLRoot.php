@@ -55,9 +55,10 @@ class MySQLRoot extends Root
         $success = false;
         if(class_exists("AUTHMySQL"))
         {
+            $port = (property_exists("AUTHMySQL", "MYSQL_PORT"))?AUTHMySQL::$MYSQL_PORT:"3306";
             $success = $this->setMySQL(
                 new MySQL(AUTHMySQL::$MYSQL_ADDRESS, AUTHMySQL::$MYSQL_DATABASE,
-                    AUTHMySQL::$MYSQL_USERNAME, AUTHMySQL::$MYSQL_PASSWORD)
+                    AUTHMySQL::$MYSQL_USERNAME, AUTHMySQL::$MYSQL_PASSWORD, $port)
             );
         }
         else

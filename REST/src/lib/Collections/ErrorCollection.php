@@ -25,6 +25,65 @@ class ErrorCollection
      */
     private static $errors;
 
+
+    /**
+     * @var array of Error columns.
+     */
+    private static $errorColumns = array();
+
+    /**
+     * Function ErrorColumn
+     * for setting column as error.
+     * @param string $table Table's name.
+     * @param string $column Column's name.
+     * @param string $message Message for error (Optional).
+     * @return bool Success of set.
+     */
+    public static function ErrorColumn($table, $column, $message = "")
+    {
+        $errorInfo = self::ERROR_INFO(__FUNCTION__);
+        if(Checker::isString($table, false, $errorInfo) && Checker::isString($column, false, $errorInfo) &&
+            Checker::isString($message, false, $errorInfo))
+        {
+            self::$errorColumns["$table.$column"] = $message;
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Function ErrorColumnMessage
+     * for getting error column's message.
+     * @param string $table Table's name.
+     * @param string $column Column's name.
+     * @return bool|string Error column's message or false.
+     */
+    public static function ErrorColumnMessage($table, $column)
+    {
+        $errorInfo = self::ERROR_INFO(__FUNCTION__);
+        if(Checker::isString($table, false, $errorInfo) && Checker::isString($column, false, $errorInfo))
+        {
+            $key = "$table.$column";
+            if(isset(self::$errorColumns[$key]))
+            {
+                return self::$errorColumns[$key];
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Function ErrorColumns
+     * for getting error columns.
+     * @return string Error columns.
+     */
+    public static function ErrorColumns()
+    {
+       return self::$errorColumns;
+    }
+
+
     /**
      * Function Errors
      * for getting all errors.

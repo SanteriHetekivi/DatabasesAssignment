@@ -19,6 +19,11 @@ class Where
     const VALUES = "values";
 
     /**
+     * @var array Keys in use.
+     */
+    private static $keys = array();
+
+    /**
      * Function ERROR_INFO
      * for making ERROR_INFO data.
      * @param string $FUNCTION Name of the function.
@@ -45,7 +50,7 @@ class Where
             {
                 $supportedKeys = array(0,1,2,3,Setup::WHERE_VALUE,Setup::WHERE_COLUMN,Setup::WHERE_CONJUNCTION,Setup::WHERE_OPERATOR);
                 $keys = array_keys($operations);
-
+                Where::$keys = array();
                 if(empty(array_intersect($supportedKeys, $keys)))
                 {
                     $return = self::MAKEFromNamedArray($operations);
@@ -120,10 +125,19 @@ class Where
             if($column !== false && $value !== false && $operator !== false && $conjunction !== false)
             {
                 $return = array();
-                $key = trim($column, Setup::ESCAPE_NAME)."Where";
-                $return[self::VALUES] = array(":".$key => $value);
-                if($first) $return[self::QUERY] = "$column $operator :$key";
-                else $return[self::QUERY] = " $conjunction $column $operator :$key";
+                $i = 0;
+                $key = ":".trim($column, Setup::ESCAPE_NAME)."Where";
+                $new_key = $key;
+                while(in_array($new_key, Where::$keys))
+                {
+                    $new_key = $key.$i;
+                    ++$i;
+                }
+                $key = $new_key;
+                Where::$keys[] = $key;
+                $return[self::VALUES] = array($key => $value);
+                if($first) $return[self::QUERY] = "$column $operator $key";
+                else $return[self::QUERY] = " $conjunction $column $operator $key";
             }
             else
             {

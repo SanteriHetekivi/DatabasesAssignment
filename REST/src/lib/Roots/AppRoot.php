@@ -137,7 +137,7 @@ class AppRoot extends MySQLRoot
      * @param array $pars Parameters.
      * @return bool|MySQLObject Object for name or false if not found.
      */
-    private function getObject($pars)
+    protected function getObject($pars)
     {
         $errorInfo = $this->ERROR_INFO(__FUNCTION__);
         $return  = false;
@@ -160,15 +160,27 @@ class AppRoot extends MySQLRoot
      * Function getId
      * for getting id from parameters.
      * @param array $pars Parameters.
-     * @return bool|int Id or false if not found.
+     * @return bool|int|array Ids or false if not found.
      */
-    private function getId($pars)
+    protected function getId($pars)
     {
         $return  = false;
         $errorInfo = $this->ERROR_INFO(__FUNCTION__);
         if (Checker::isArray($pars,false, $errorInfo) && isset($pars[1]))
         {
-            $return = Parser::Int($pars[1], $errorInfo);
+            $val = $pars[1];
+            if(Checker::isString($val))
+            {
+                $values = explode("_", $val);
+                $ids = false;
+                foreach($values as $value)
+                {
+                    $id = Parser::Int($value, $errorInfo);
+                    if($id) $ids[] = $id;
+                }
+                return $ids;
+            }
+            else $return = Parser::Int($val, $errorInfo);
         }
         return $return;
     }
@@ -179,7 +191,7 @@ class AppRoot extends MySQLRoot
      * @param array $pars Parameters.
      * @return bool|array Values as array or false if not found.
      */
-    private function getValues($pars)
+    protected function getValues($pars)
     {
         $return = false;
         $errorInfo = $this->ERROR_INFO(__FUNCTION__);

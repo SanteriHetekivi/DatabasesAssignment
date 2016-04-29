@@ -179,4 +179,19 @@ class MySQLChecker extends Checker
         return $success;
     }
 
+    /**
+     * Function isDATETIME
+     * for checking if given datetime string is MySQL DATETIME.
+     * @param string $datetime DATETIME to check.
+     * @param bool|array $errorInfo Array containing file and function names. (Optional)
+     * @return bool Was DATETIME.
+     */
+    public static function isDATETIME($datetime, $errorInfo = false)
+    {
+        $success = (DateTime::createFromFormat('Y-m-d H:i:s', $datetime) !== false);
+        if($success ===  false && $errorInfo) ErrorCollection::addErrorInfo($errorInfo,"Given string is not datetime!",
+            $datetime);
+        return $success;
+    }
+
 }

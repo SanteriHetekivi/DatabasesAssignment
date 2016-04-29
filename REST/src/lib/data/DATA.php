@@ -64,6 +64,7 @@ class DATA
             "system" => array(
                 "errors" => ErrorCollection::ErrorsData(),
                 "success"=> DATA::Success(),
+                "errorColumns" => ErrorCollection::ErrorColumns(),
             ),
             "client" => array(
                 "data" => $data,

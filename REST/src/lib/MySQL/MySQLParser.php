@@ -239,4 +239,14 @@ class MySQLParser
         $success = ErrorCollection::addError(__FILE__, $func, $message, $variable);
         return $success;
     }
+
+    public static function ID($id, $errorInfo = false)
+    {
+        $id = Parser::Int($id);
+        if(MySQLChecker::isId($id, $errorInfo))
+        {
+            return $id;
+        }
+        return false;
+    }
 }

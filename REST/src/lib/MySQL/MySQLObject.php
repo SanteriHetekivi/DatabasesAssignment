@@ -107,7 +107,7 @@ class MySQLObject extends MySQLRoot
      * @param bool $linked Get linked object if is set.
      * @return null|string|int|object|bool Value for column or null.
      */
-    public function Value($name, $linked = false)
+    public function Value($name, $linked = false, $mysql = false)
     {
         $return = null;
         if(Checker::isString($name, false, $this->ERROR_INFO(__FUNCTION__)) && isset($this->columns[$name]) &&
@@ -118,7 +118,7 @@ class MySQLObject extends MySQLRoot
             {
                 $return = $column->Linked();
             }
-            else $return  = $this->columns[$name]->Value();
+            else $return  = $this->columns[$name]->Value($mysql);
         }
         return $return;
     }
@@ -129,7 +129,7 @@ class MySQLObject extends MySQLRoot
      * @param bool $linked Get linked object's values if is set.
      * @return array Values for columns.
      */
-    public function Values($linked = false)
+    public function Values($linked = false, $mysql = false)
     {
         $return = array();
         $columns = $this->Columns();
@@ -143,7 +143,7 @@ class MySQLObject extends MySQLRoot
                     {
                         $return[$name] =  $column->Linked()->Values($linked);
                     }
-                    else $return[$name] = $column->Value();
+                    else $return[$name] = $column->Value($mysql);
                 }
             }
         }
@@ -181,7 +181,7 @@ class MySQLObject extends MySQLRoot
     public function setValues($values)
     {
         $success = false;
-        if(Checker::isArray($values, false, $this->ERROR_INFO(__FUNCTION__)))
+        if(Checker::isArray($values, true, $this->ERROR_INFO(__FUNCTION__)))
         {
             $success = true;
             foreach($values as $name => $value)
@@ -298,11 +298,31 @@ class MySQLObject extends MySQLRoot
     /**
      * Function setID
      * for setting id to value.
-     * @param int $value Value for id.
+     * @param int|array $value Value for id.
      * @return bool Success of the function.
      */
     public function setID($value)
     {
+        if(Checker::isArray($value))
+        {
+            $names = $this->IdNames();
+            $valueCount = count($value);
+            if(Checker::isArray($names) && $valueCount == count($names))
+            {
+                $values = array();
+                foreach($value as $key => $id)
+                {
+                    if(isset($names[$key]))
+                    {
+                        $values[$names[$key]] = $id;
+                    }
+                }
+                if($valueCount == count($names))
+                {
+                    return $this->setValues($values);
+                }
+            }
+        }
         return $this->setValue($this->IdName(), $value);
     }
 
@@ -314,7 +334,6 @@ class MySQLObject extends MySQLRoot
     {
         parent::__construct();
         $this->idNames = false;
-        $this->FILE = __FILE__;
         $this->INITIALIZE();
         if($values !== false)
         {
@@ -346,17 +365,18 @@ class MySQLObject extends MySQLRoot
     {
         $success = false;
         $ids = $this->IDs();
+        $errorInfo = $this->ERROR_INFO(__FUNCTION__);
         if($this->Connected(__FUNCTION__))
         {
-
             if(MySQLChecker::isArray($ids)) $where = $ids;
-            else $where = $this->Values(false);
+            else $where = $this->Values(false, true);
+
             $query = new MySQLQuery();
             $queryOK = $query->setSelect("*", $this->Table(), $where);
             if($queryOK)
             {
                 $values = $this->MySQL()->CALL($query, true);
-                if(Checker::isArray($values))
+                if(Checker::isArray($values, false))
                 {
                     $success = $this->setValues($values);
                 }
@@ -390,7 +410,7 @@ class MySQLObject extends MySQLRoot
         if($this->beforeCOMMIT() && $this->Connected(__FUNCTION__) && $this->Check())
         {
             $query = new MySQLQuery();
-            $values = $this->Values(false);
+            $values = $this->Values(false, true);
             // Update
             if($this->inDatabase())
             {
@@ -400,7 +420,10 @@ class MySQLObject extends MySQLRoot
             // Insert
             else
             {
-                if(isset($values[$this->IdName()])) unset($values[$this->IdName()]);
+                if(count($this->IdNames()) == 1)
+                {
+                    if(isset($values[$this->IdName()])) unset($values[$this->IdName()]);
+                }
                 $queryOK = $query->setInsert($this->Table(), $values);
             }
             if($queryOK)
@@ -408,12 +431,16 @@ class MySQLObject extends MySQLRoot
                 $queryResult = $this->MySQL()->CALL($query, true);
                 if($queryResult !== false)
                 {
-                    if($query->Action() === "INSERT")
+                    if($query->Action() === "INSERT" && count($this->IdNames()) == 1)
                     {
                         $this->setID($queryResult);
                     }
                     $selectOk = $this->SELECT();
                     $success = $selectOk && $this->afterCOMMIT();
+                }
+                else
+                {
+                    $this->addError(__FUNCTION__, "Query returned false!", $queryResult, $values);
                 }
             }
             else
@@ -445,7 +472,7 @@ class MySQLObject extends MySQLRoot
         if($this->Connected(__FUNCTION__))
         {
             if(MySQLChecker::isArray($ids)) $where = $ids;
-            else $where = $this->Values(false);
+            else $where = $this->Values(false, true);
             $query = new MySQLQuery();
             $queryOK = $query->setDelete($this->Table(), $where);
             if($queryOK)
@@ -496,7 +523,7 @@ class MySQLObject extends MySQLRoot
             if ($queryOK)
             {
                 $values = $this->MySQL()->CALL($query, true);
-                if (Checker::isArray($values))
+                if (Checker::isArray($values, false))
                 {
                     $success = true;
                 }
@@ -544,13 +571,13 @@ class MySQLObject extends MySQLRoot
         if($queryOK)
         {
             $rows = $this->MySQL()->CALL($query);
-            if(Checker::isArray($rows, false, $errorInfo))
+            if(Checker::isArray($rows, true, $errorInfo))
             {
                 $classes = array();
                 $class = get_class($this);
                 foreach($rows as $row)
                 {
-                    if(Checker::isArray($row, false, $errorInfo)) {
+                    if(Checker::isArray($row, true, $errorInfo)) {
                         $success = true;
                         $obj = new $class();
                         foreach ($row as $idName => $id) {
@@ -594,6 +621,17 @@ class MySQLObject extends MySQLRoot
             if(count($classes) === count($values)) $return = $values;
         }
         return $return;
+    }
+
+    /**
+     * Function ErrorColumn
+     * for setting errors column.
+     * @param string $column Column's name.
+     * @param string $message Message for error.
+     */
+    public function ErrorColumn($column, $message)
+    {
+        ErrorCollection::ErrorColumn($this->Table(), $column, $message);
     }
 
 }

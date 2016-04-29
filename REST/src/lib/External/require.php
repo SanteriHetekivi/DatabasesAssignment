@@ -12,3 +12,5 @@
 
 require 'kint/Kint.class.php';
 
+require 'Tools.php';
+

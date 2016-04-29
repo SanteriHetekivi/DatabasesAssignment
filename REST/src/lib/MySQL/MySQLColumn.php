@@ -14,7 +14,8 @@ class MySQLColumn extends Root
     const SUPPORTED_TYPES = array(
         "VARCHAR",
         "ID",
-        "BOOL"
+        "BOOL",
+        "DATETIME",
     );
 
     /**
@@ -60,12 +61,20 @@ class MySQLColumn extends Root
      * for getting column's value.
      * @return string|bool|int|double Value of rows column.
      */
-    public function Value()
+    public function Value($mysql = false)
     {
-        $type = $this->Type();
         $value = $this->value;
-        if($type === "ID")      $value = Parser::Int($value);
-        if($type === "BOOL")    $value = (bool)$value;
+        $type = $this->Type();
+        if($mysql === false)
+        {
+            if($type === "ID")          $value = Parser::Int($value);
+            if($type === "BOOL")        $value = (bool)$value;
+            if($type === "DATETIME")    $value =  Parser::Time($value);
+        }
+        else
+        {
+            if($type === "ID" && Parser::Int($value) === 0) $value = "NULL";
+        }
         return $value;
     }
 
@@ -200,13 +209,17 @@ class MySQLColumn extends Root
      */
     public function CHECK($value=NULL)
     {
-        if($value === NULL) $value = $this->Value();
-        $success = false;
+        if(is_null($value)) $value = $this->Value();
         $errorInfo = $this->ERROR_INFO(__FUNCTION__);
         $type = $this->Type();
         if($type === "ID")          $success = Checker::isInt($value, true, true, $errorInfo);
         elseif($type === "VARCHAR") $success = Checker::isString($value, true, $errorInfo);
         elseif($type === "BOOL")    $success = Checker::isBool($value, $errorInfo);
+        elseif($type === "DATETIME")
+        {
+            if(Checker::isInt($value)) $value = Parser::DATETIME($value);
+            $success = MySQLChecker::isDATETIME($value, $errorInfo);
+        }
         else $success = true;
         return $success;
     }
@@ -220,6 +233,10 @@ class MySQLColumn extends Root
         if($type === "ID") $value = Parser::Int($value, $errorInfo);
         elseif($type === "BOOL") $value = Parser::Bool($value, $errorInfo);
         elseif($type === "VARCHAR") $value = Parser::String($value, $errorInfo);
+        elseif($type === "DATETIME" && Checker::isInt($value))
+        {
+            $value = Parser::DATETIME($value);
+        }
         if($this->CHECK($value))
         {
             if($type == "BOOL") $value = ($value)?"1":"0";

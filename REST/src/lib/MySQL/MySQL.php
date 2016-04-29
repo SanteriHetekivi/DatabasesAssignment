@@ -51,12 +51,13 @@ class MySQL extends Root
      * @param string $database Name of the database.
      * @param string $username Username for the connection.
      * @param string $password Password for the connection.
+     * @param string $port     Port for the connection. (Optional default 3306)
      */
-    public function __construct($address, $database, $username, $password)
+    public function __construct($address, $database, $username, $password, $port = "3306")
     {
         parent::__construct();
         $this->FILE = __FILE__;
-        $this->CONNECT($address, $database, $username, $password);
+        $this->CONNECT($address, $database, $username, $password, $port);
     }
 
     /**
@@ -78,24 +79,27 @@ class MySQL extends Root
      * @param string $database Name of the database.
      * @param string $username Username for the connection.
      * @param string $password Password for the connection.
+     * @param string $port     Port for the connection. (Optional default 3306)
      * @return bool Success of the function.
      */
-    private function CONNECT($address, $database, $username, $password)
+    private function CONNECT($address, $database, $username, $password, $port = "3306")
     {
         $success = false;
         $errorInfo = $this->ERROR_INFO(__FUNCTION__);
         //If all variables are set
         if(Checker::isString($address, true, $errorInfo) && Checker::isString($database, true, $errorInfo) &&
-            Checker::isString($username, true, $errorInfo) && Checker::isString($password, true, $errorInfo))
+            Checker::isString($username, true, $errorInfo) && Checker::isString($password, true, $errorInfo) &&
+            Checker::isString($port, true, $errorInfo))
         {
             try
             {
-                $conn = new PDO("mysql:host=".$address.";dbname=".$database.";charset=utf8", $username, $password);
+                $conn = new PDO("mysql:host=$address;dbname=$database;charset=utf8;port=$port", $username, $password);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $success = $this->setConn($conn);
             }
             catch(PDOException $e)
             {
+
                 $this->addError(__FUNCTION__, "Connection to data space failed!", $e->getMessage());
                 $conn = null;
             }
@@ -159,8 +163,10 @@ class MySQL extends Root
                     try {
                         $stmt = $this->Conn()->prepare($sql);
                         if (Checker::isArray($values, false)) {
-                            foreach ($values as $key => &$value) {
-                                $stmt->bindParam($key, $value);
+                            foreach ($values as $key => &$value)
+                            {
+                                if($value === "NULL") $stmt->bindValue($key, NULL);
+                                else $stmt->bindValue($key, $value);
                             }
                         }
                         $result = $stmt->execute();
@@ -169,11 +175,10 @@ class MySQL extends Root
                             if ($query->Action() === "SELECT")
                             {
                                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                if(Checker::isArray($result,false))
+                                if(Checker::isArray($result, false))
                                 {
                                     if($onlyOne) $result = current($result);
                                 }
-                                else $result = false;
                             }
                             elseif($query->Action() === "INSERT")
                             {
@@ -183,7 +188,8 @@ class MySQL extends Root
 
                     } catch (PDOException $e) {
                         $result = false;
-                        $this->addError(__FUNCTION__, "SQL command failed.", $e->getMessage());
+                        $this->addError(__FUNCTION__, "SQL command failed.", array("message" =>$e->getMessage(),
+                            "query" => $sql, "values" => $values));
                     }
                 }
             }

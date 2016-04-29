@@ -164,7 +164,7 @@ class Checker
      * for checking if given number is numeric.
      * @param string $number Number to check.
      * @param bool|array $errorInfo Array containing file and function names. (Optional)
-     * @return bool Was given keyword supported.
+     * @return bool Was numeric.
      */
     public static function isNumeric($number, $errorInfo = false)
     {
@@ -172,6 +172,19 @@ class Checker
         if($success ===  false && $errorInfo) ErrorCollection::addErrorInfo($errorInfo,"Given number is not numeric!",
             $number);
         return $success;
+    }
+
+
+    /**
+     * Function isTime
+     * for checking if given int is time.
+     * @param int $number Number to check.
+     * @param bool|array $errorInfo Array containing file and function names. (Optional)
+     * @return bool Was time.
+     */
+    public static function isTime($number, $errorInfo = false)
+    {
+        return Checker::isInt($number, true, false, $errorInfo);
     }
 
 }

@@ -41,4 +41,22 @@ class Demo extends MySQLObject
         $DemoItem = new DemoItem();
         return $DemoItem->GetItems($this->ID());
     }
+
+    protected function beforeCOMMIT()
+    {
+        $success = parent::beforeCOMMIT();
+        $demoer = $this->Value("demoer",true);
+        if(Checker::isObject($demoer, "User") === false)
+        {
+            $this->ErrorColumn("demoer", "No demoer set!");
+            $success = false;
+        }
+        elseif($demoer->isDemoer() === false)
+        {
+            $this->ErrorColumn("demoer", "User" . $demoer->Name() . " has no right to be demoer!");
+            $success = false;
+        }
+
+        return $success;
+    }
 }

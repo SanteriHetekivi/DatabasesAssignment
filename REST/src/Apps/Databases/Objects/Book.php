@@ -173,6 +173,8 @@ class Book extends MySQLObject
             ErrorCollection::addErrorInfo($errorInfo, "Start was after or on end!", array("start" => $start, "end" => $end));
             $success = false;
         }
+        $success = $this->canBeBooked() && $success;
+
         return $success;
     }
 
@@ -182,6 +184,7 @@ class Book extends MySQLObject
         if($booker === false)       $booker     = $this->Value("booker");
         if($timeStart === false)    $timeStart  = $this->Value("timeStart");
         if($timeEnd === false)      $timeEnd    = $this->Value("timeEnd");
+        $errorInfo  = $this->ERROR_INFO(__FUNCTION__);
 
         if(!Checker::isObject($booker, "User"))
         {
@@ -217,8 +220,15 @@ class Book extends MySQLObject
             $this->ErrorColumn("booker", "User ".$booker->Name()." has no right to book!");
             $success = false;
         }
-        $hasBookings = $item->isBooked($timeStart, $timeEnd);
-        $hasBorrows = $item->isBorrowed($timeStart, $timeEnd);
+        $bookings = $item->Bookings($timeStart, $timeEnd);
+        $borrows = $item->Borrows($timeStart, $timeEnd);
+
+        $hasBorrows = Checker::isArray($borrows, false);
+        $hasBookings = Checker::isArray($bookings, false);
+
+        if(count($bookings) === 1 && Checker::isObject(end($bookings), "Book", false, $errorInfo) &&
+            end($bookings)->ID() == $this->ID()) $hasBookings = false;
+
         if($hasBookings || $hasBorrows)
         {
             if($hasBookings && $hasBorrows) $type = "bookings and borrows";

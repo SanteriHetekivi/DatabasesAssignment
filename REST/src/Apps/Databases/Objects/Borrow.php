@@ -300,18 +300,9 @@ class Borrow extends MySQLObject
                 $success = false;
             }
         }
-        $checker = $this->Value("checker");
-        if($checker <= 0)
-        {
-            $this->ErrorColumn("checker", "No checker set!");
-            $success = false;
-        }
-        $borrower = $this->Value("borrower");
-        if($borrower <= 0)
-        {
-            $this->ErrorColumn("borrower", "No borrower set!");
-            $success = false;
-        }
+
+        $success = $this->canBeBorrowed() && $success;
+
         return $success;
     }
 
@@ -351,7 +342,9 @@ class Borrow extends MySQLObject
                 $success = false;
             }
             $bookings = $item->Bookings($timeBorrow, $timeDeadline);
-            $hasBorrows = $item->isBorrowed($timeBorrow, $timeDeadline);
+            $borrows = $item->Borrows($timeBorrow, $timeDeadline);
+
+            $hasBorrows = Checker::isArray($borrows, false);
             $hasBookings = Checker::isArray($bookings, false);
 
             if($book)
@@ -376,6 +369,9 @@ class Borrow extends MySQLObject
                     $success = false;
                 }
             }
+
+            if(count($borrows) === 1 && Checker::isObject(end($bookings), "Borrow", false, $errorInfo) &&
+                end($bookings)->ID() == $this->ID()) $hasBorrows = false;
 
             if($hasBookings || $hasBorrows)
             {

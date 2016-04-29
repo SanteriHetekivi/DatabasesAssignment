@@ -301,14 +301,14 @@ class App extends AppRoot
     {
         $return = false;
         $borrow = new Borrow();
-        $borrows = $borrow->Borrows(false, false, RETURN_STATUS::NOT_RETURNED, Tools::TimeNow(), PHP_INT_MAX);
+        $borrows = $borrow->Borrows(false, false, RETURN_STATUS::NOT_RETURNED, 0, PHP_INT_MAX);
         if(Checker::isArray($borrows))
         {
             $return = array();
             foreach($borrows as $borrow)
             {
                 /** @var Borrow $borrow */
-                $return[$borrow->ID()] = $borrow->Values(true);
+                if($borrow->isReturned() === false) $return[$borrow->ID()] = $borrow->Values(true);
             }
         }
         DATA::setSuccess(Checker::isArray($return));
